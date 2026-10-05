@@ -3,6 +3,7 @@ Custom Licensing & Real-time User Control Server
 Supports:
 - Web Admin Dashboard (accessible via browser at /dashboard)
 - KeyAuth 1.3 protocol emulation (/api/1.3/) for direct app connectivity
+- Strict Username + License Key matching verification
 - Live Heartbeat tracking (tracks who is online right now)
 - Remote session termination / Instant Kick / Ban
 - Automated Key Generation API for bots/webhooks
@@ -37,6 +38,22 @@ def init_db():
         )
     """)
     conn.commit()
+
+    # Pre-seed initial default licenses if empty
+    cursor.execute("SELECT COUNT(*) FROM licenses")
+    count = cursor.fetchone()[0]
+    if count == 0:
+        now_str = datetime.now(timezone.utc).isoformat()
+        seeds = [
+            ("KNOXYY-A9NM-09Q7-V1UH", "NEEL", None, now_str, "LIFETIME", 1),
+            ("KNOXYY-8K5M-5ULT-Y2ZV", "AdminUser", None, now_str, "LIFETIME", 1)
+        ]
+        cursor.executemany("""
+            INSERT INTO licenses (key, username, hwid, created_at, expires_at, is_active)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, seeds)
+        conn.commit()
+
     conn.close()
 
 def get_db():
@@ -212,7 +229,6 @@ class AuthHandler(BaseHTTPRequestHandler):
         content_length = int(self.headers.get("Content-Length", 0))
         raw_body = self.rfile.read(content_length).decode("utf-8", errors="replace")
 
-        # Handle both JSON and application/x-www-form-urlencoded
         body = {}
         content_type = self.headers.get("Content-Type", "")
         if "application/json" in content_type:
@@ -221,7 +237,6 @@ class AuthHandler(BaseHTTPRequestHandler):
             except Exception:
                 pass
         else:
-            # urlencoded form data (used by the desktop client's KeyAuth client)
             parsed = urllib.parse.parse_qs(raw_body)
             body = {k: v[0] for k, v in parsed.items()}
 
@@ -241,7 +256,7 @@ class AuthHandler(BaseHTTPRequestHandler):
             self._send_response(404, {"error": "Endpoint not found"})
 
     def handle_keyauth_emulation(self, body: dict):
-        """Emulate KeyAuth 1.3 protocol so the desktop app communicates with our local server."""
+        """Emulate KeyAuth 1.3 protocol with strict Username + Key validation."""
         req_type = body.get("type", "").strip()
         client_ip = self.client_address[0]
         now_str = datetime.now(timezone.utc).isoformat()
@@ -259,35 +274,64 @@ class AuthHandler(BaseHTTPRequestHandler):
 
         if req_type == "login":
             username = body.get("username", "").strip()
-            password = body.get("password", "").strip()
+            password_key = body.get("password", "").strip()
+
+            if not username or not password_key:
+                self._send_response(200, {
+                    "success": False,
+                    "message": "Dono Username aur License Key daalna zaroori hai."
+                })
+                return
 
             conn = get_db()
             cursor = conn.cursor()
-            # Find matching license by username or key
-            cursor.execute("SELECT * FROM licenses WHERE (username = ? OR key = ?)", (username, username))
+            
+            # STRICT CHECK: Username AND Key MUST both match the exact record!
+            cursor.execute("""
+                SELECT * FROM licenses 
+                WHERE LOWER(TRIM(username)) = LOWER(TRIM(?)) AND TRIM(key) = TRIM(?)
+            """, (username, password_key))
             row = cursor.fetchone()
 
             if not row:
                 conn.close()
-                self._send_response(200, {"success": False, "message": "no account by that name."})
+                self._send_response(200, {
+                    "success": False,
+                    "message": "Username aur License Key match nahi hua! Kripya sahi credentials daalein."
+                })
                 return
 
             if row["is_active"] != 1:
                 conn.close()
-                self._send_response(200, {"success": False, "message": "Account has been banned or revoked."})
+                self._send_response(200, {"success": False, "message": "Yeh License ban/revoked kar diya gaya hai."})
                 return
 
-            # Update HWID and presence
+            # Check expiration
+            if row["expires_at"] != "LIFETIME":
+                try:
+                    exp = datetime.fromisoformat(row["expires_at"]).replace(tzinfo=timezone.utc)
+                    if datetime.now(timezone.utc) > exp:
+                        conn.close()
+                        self._send_response(200, {"success": False, "message": "Aapka License expire ho chuka hai."})
+                        return
+                except Exception:
+                    pass
+
+            # HWID lock check
             if not row["hwid"]:
                 cursor.execute("UPDATE licenses SET hwid = ?, ip_address = ?, last_seen = ? WHERE key = ?",
                                (hwid, client_ip, now_str, row["key"]))
+            elif row["hwid"] != hwid:
+                conn.close()
+                self._send_response(200, {"success": False, "message": "Yeh key kisi aur PC par bound hai (HWID locked)."})
+                return
             else:
                 cursor.execute("UPDATE licenses SET ip_address = ?, last_seen = ?, force_logout = 0 WHERE key = ?",
                                (client_ip, now_str, row["key"]))
             conn.commit()
             conn.close()
 
-            # Return success in KeyAuth format
+            # Return success
             self._send_response(200, {
                 "success": True,
                 "message": "Logged in!",
@@ -305,23 +349,38 @@ class AuthHandler(BaseHTTPRequestHandler):
 
             conn = get_db()
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM licenses WHERE (key = ? OR username = ?)", (key, key))
+            cursor.execute("SELECT * FROM licenses WHERE TRIM(key) = TRIM(?)", (key,))
             row = cursor.fetchone()
 
             if not row:
                 conn.close()
-                self._send_response(200, {"success": False, "message": "Invalid license key."})
+                self._send_response(200, {"success": False, "message": "Galat License Key hai."})
                 return
 
             if row["is_active"] != 1:
                 conn.close()
-                self._send_response(200, {"success": False, "message": "License has been banned or revoked."})
+                self._send_response(200, {"success": False, "message": "Yeh License ban/revoked kar diya gaya hai."})
                 return
 
-            # Update HWID and presence
+            # Expiration
+            if row["expires_at"] != "LIFETIME":
+                try:
+                    exp = datetime.fromisoformat(row["expires_at"]).replace(tzinfo=timezone.utc)
+                    if datetime.now(timezone.utc) > exp:
+                        conn.close()
+                        self._send_response(200, {"success": False, "message": "Aapka License expire ho chuka hai."})
+                        return
+                except Exception:
+                    pass
+
+            # HWID lock
             if not row["hwid"]:
                 cursor.execute("UPDATE licenses SET hwid = ?, ip_address = ?, last_seen = ? WHERE key = ?",
                                (hwid, client_ip, now_str, row["key"]))
+            elif row["hwid"] != hwid:
+                conn.close()
+                self._send_response(200, {"success": False, "message": "Yeh key kisi aur PC par bound hai (HWID locked)."})
+                return
             else:
                 cursor.execute("UPDATE licenses SET ip_address = ?, last_seen = ?, force_logout = 0 WHERE key = ?",
                                (client_ip, now_str, row["key"]))
