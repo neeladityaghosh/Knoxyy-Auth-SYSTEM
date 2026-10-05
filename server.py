@@ -18,7 +18,7 @@ from datetime import datetime, timezone, timedelta
 import os
 
 DB_FILE = os.path.join(os.path.dirname(__file__), "licenses.db")
-PORT = 8080
+PORT = int(os.environ.get("PORT", 8080))
 
 def init_db():
     conn = sqlite3.connect(DB_FILE)

@@ -1,0 +1,2 @@
+# KNOXYY 69 Custom Auth Server
+# Uses Python standard library only (no external dependencies required)
