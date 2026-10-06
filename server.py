@@ -72,6 +72,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"><title>KNOXYY 69 - License Control Center</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
 <style>
   body { background: #0f172a; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 25px; }
   h1 { color: #38bdf8; margin-bottom: 5px; }
@@ -95,8 +96,13 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 </style>
 </head>
 <body>
-  <h1>KNOXYY 69 - Real-time Control Center</h1>
-  <div class="subtitle">Monitor active sessions, control running instances, and automate key generation.</div>
+  <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+    <img src="/logo.png" alt="KNOXYY 69 Logo" style="width: 48px; height: 48px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(56,189,248,0.5));">
+    <div>
+      <h1 style="margin: 0; line-height: 1.2;">KNOXYY 69 - Real-time Control Center</h1>
+      <div class="subtitle" style="margin: 4px 0 0 0;">Monitor active sessions, control running instances, and automate key generation.</div>
+    </div>
+  </div>
 
   <div class="grid">
     <div class="card"><div>Total Licenses</div><div class="num" id="stat-total">0</div></div>
@@ -222,6 +228,26 @@ class AuthHandler(BaseHTTPRequestHandler):
             self._send_response(200, {"licenses": rows})
         elif self.path == "/api/v1/health":
             self._send_response(200, {"status": "online"})
+        elif self.path == "/logo.png":
+            logo_file = os.path.join(os.path.dirname(__file__), "logo.png")
+            if os.path.exists(logo_file):
+                self.send_response(200)
+                self.send_header("Content-Type", "image/png")
+                self.end_headers()
+                with open(logo_file, "rb") as f:
+                    self.wfile.write(f.read())
+            else:
+                self._send_response(404, {"error": "Logo not found"})
+        elif self.path == "/favicon.ico":
+            fav_file = os.path.join(os.path.dirname(__file__), "favicon.ico")
+            if os.path.exists(fav_file):
+                self.send_response(200)
+                self.send_header("Content-Type", "image/x-icon")
+                self.end_headers()
+                with open(fav_file, "rb") as f:
+                    self.wfile.write(f.read())
+            else:
+                self._send_response(404, {"error": "Favicon not found"})
         else:
             self._send_response(404, {"error": "Not Found"})
 
