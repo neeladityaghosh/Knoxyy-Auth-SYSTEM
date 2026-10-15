@@ -1,0 +1,110 @@
+:root {
+  --bg-dark: #0b0c10;
+  --bg-surface: #121319;
+  --bg-surface-elevated: #171822;
+  --bg-surface-hover: #1c1e2b;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.14);
+  --border-glow-purple: rgba(139, 92, 246, 0.4);
+
+  --purple-primary: #8b5cf6;
+  --purple-gradient: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+  --purple-card-bg: linear-gradient(135deg, #2e1065 0%, #3b0764 45%, #1e1b4b 100%);
+  --cyan-primary: #38bdf8;
+  --green-primary: #10b981;
+  --red-primary: #ef4444;
+
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 22px;
+  --radius-pill: 9999px;
+
+  --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* App Layout - Full-width balanced view */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.main-content {
+  margin-left: 80px;
+  flex: 1;
+  width: calc(100% - 80px);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-inner {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px 36px 64px 36px;
+  flex: 1;
+}
+
+/* Animations */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.45);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInScale 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: #1e202c;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2e3244;
+}

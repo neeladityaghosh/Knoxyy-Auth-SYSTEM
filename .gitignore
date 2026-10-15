@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Production build artifacts (if source is built, but here dist is served by server.py directly)
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs & temp
+*.log
+.DS_Store
+Thumbs.db
+
+# Bundle & patch exports
+*.bundle
+*.patch
