@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knoxyy Central — Gaming Suite Portal</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<style>
+  /* ────────────────────────────────────────────────
+     TOKENS & RESET
+  ──────────────────────────────────────────────── */
+  :root {
+    --bg:          #07090f;
+    --surface-1:   #0d1117;
+    --surface-2:   #161b27;
+    --surface-3:   #1c2436;
+    --border:      rgba(255,255,255,0.06);
+    --border-hi:   rgba(255,255,255,0.14);
+
+    --gold:        #f59e0b;
+    --gold-dim:    #d97706;
+    --gold-glow:   rgba(245,158,11,0.30);
+    --cyan:        #38bdf8;
+    --cyan-dim:    #0284c7;
+    --cyan-glow:   rgba(56,189,248,0.25);
+    --green:       #22c55e;
+    --red:         #ef4444;
+
+    --txt-1:  #f1f5f9;
+    --txt-2:  #94a3b8;
+    --txt-3:  #475569;
+
+    --radius-sm:  8px;
+    --radius-md:  12px;
+    --radius-lg:  18px;
+    --radius-xl:  24px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--txt-1);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Animated background canvas ── */
+  #bg-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  /* ── Layout wrapper ── */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 20px 24px 60px;
+  }
+
+  /* ────────────────────────────────────────────────
+     TOP NAV
+  ──────────────────────────────────────────────── */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 20px;
+    background: rgba(13,17,23,0.75);
+    backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    margin-bottom: 28px;
+    position: sticky;
+    top: 20px;
+    z-index: 100;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .brand-logo-wrap {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(56,189,248,0.1));
+    border: 1px solid rgba(245,158,11,0.3);
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .brand-text { line-height: 1.2; }
+  .brand-name {
+    font-size: 15px; font-weight: 800; letter-spacing: 0.5px;
+    background: linear-gradient(90deg, #f8fafc 30%, var(--gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .brand-tag {
+    font-size: 10px; font-weight: 600; color: var(--txt-2);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  .nav-pills {
+    display: flex; gap: 4px; align-items: center;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 4px;
+  }
+  .nav-pill {
+    background: transparent; color: var(--txt-2);
+    border: none; padding: 7px 14px; border-radius: var(--radius-sm);
+    font-weight: 600; font-size: 12.5px; cursor: pointer;
+    transition: all 0.18s ease; white-space: nowrap;
+  }
+  .nav-pill:hover { color: var(--txt-1); background: var(--surface-3); }
+  .nav-pill.active {
+    background: var(--surface-3); color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  }
+
+  .btn-create-key {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+    color: #000; font-weight: 800; font-size: 12.5px;
+    border: none; padding: 9px 18px; border-radius: var(--radius-sm);
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    box-shadow: 0 0 16px var(--gold-glow);
+    flex-shrink: 0;
+  }
+  .btn-create-key:hover {
+    background: linear-gradient(135deg, #fbbf24, var(--gold));
+    box-shadow: 0 0 24px var(--gold-glow);
+    transform: translateY(-1px);
+  }
+
+  /* ────────────────────────────────────────────────
+     HERO STATS BAR
+  ──────────────────────────────────────────────── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+  }
+  .stat-card.gold::before  { background: linear-gradient(90deg, var(--gold), transparent); }
+  .stat-card.cyan::before  { background: linear-gradient(90deg, var(--cyan), transparent); }
+  .stat-card.green::before { background: linear-gradient(90deg, var(--green), transparent); }
+  .stat-card.red::before   { background: linear-gradient(90deg, var(--red), transparent); }
+  .stat-card:hover { border-color: var(--border-hi); }
+
+  .stat-label {
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--txt-2); margin-bottom: 6px;
+  }
+  .stat-value {
+    font-size: 26px; font-weight: 800; line-height: 1;
+  }
+  .stat-value.gold  { color: var(--gold); }
+  .stat-value.cyan  { color: var(--cyan); }
+  .stat-value.green { color: var(--green); }
+  .stat-value.red   { color: var(--red); }
+  .stat-sub { font-size: 11px; color: var(--txt-3); margin-top: 4px; }
+
+  /* ────────────────────────────────────────────────
+     SUITE SELECTION HUB
+  ──────────────────────────────────────────────── */
+  #suite-selection { margin-bottom: 30px; }
+
+  .hub-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .hub-header .eyebrow {
+    display: inline-block;
+    background: rgba(245,158,11,0.12);
+    color: var(--gold);
+    border: 1px solid rgba(245,158,11,0.25);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 999px;
+    margin-bottom: 16px;
+  }
+  .hub-header h2 {
+    font-size: 30px; font-weight: 900;
+    background: linear-gradient(135deg, #f8fafc 40%, #94a3b8);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+  }
+  .hub-header p { color: var(--txt-2); font-size: 14px; max-width: 480px; margin: 0 auto; line-height: 1.6; }
+
+  .suite-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 20px;
+    max-width: 1050px;
+    margin: 0 auto;
+  }
+
+  .suite-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 30px;
+    display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+    cursor: default;
+  }
+  .suite-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.35s;
+    pointer-events: none;
+  }
+  .suite-card.emu::after  { box-shadow: inset 0 0 60px rgba(245,158,11,0.08); }
+  .suite-card.opti::after { box-shadow: inset 0 0 60px rgba(56,189,248,0.08); }
+
+  .suite-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--border-hi);
+  }
+  .suite-card:hover::after { opacity: 1; }
+  .suite-card.emu:hover  { border-color: rgba(245,158,11,0.45); box-shadow: 0 20px 50px rgba(245,158,11,0.12); }
+  .suite-card.opti:hover { border-color: rgba(56,189,248,0.45);  box-shadow: 0 20px 50px rgba(56,189,248,0.12); }
+
+  /* glow strip top */
+  .suite-card .top-strip {
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+  .suite-card.emu  .top-strip { background: linear-gradient(90deg, var(--gold), transparent 70%); }
+  .suite-card.opti .top-strip { background: linear-gradient(90deg, var(--cyan), transparent 70%); }
+
+  /* floating corner watermark */
+  .suite-card .watermark {
+    position: absolute;
+    right: -14px; top: -14px;
+    font-size: 100px; opacity: 0.03;
+    line-height: 1; user-select: none;
+  }
+
+  .card-top {
+    display: flex; align-items: flex-start; gap: 16px;
+    margin-bottom: 20px;
+  }
+  .card-icon-wrap {
+    width: 58px; height: 58px; flex-shrink: 0;
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+  }
+  .emu .card-icon-wrap  { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.2); }
+  .opti .card-icon-wrap { background: rgba(56,189,248,0.10); border: 1px solid rgba(56,189,248,0.2); }
+
+  .card-meta { flex: 1; }
+  .card-meta h3 { font-size: 19px; font-weight: 800; margin-bottom: 4px; }
+  .card-badge {
+    display: inline-block;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 9px; border-radius: 999px;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .badge-emu  { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+  .badge-opti { background: rgba(56,189,248,0.12); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.25); }
+
+  .card-desc {
+    color: var(--txt-2); font-size: 13px; line-height: 1.65;
+    margin-bottom: 20px;
+  }
+
+  .features {
+    list-style: none; display: flex; flex-direction: column; gap: 8px;
+    margin-bottom: 24px;
+  }
+  .features li {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: #cbd5e1;
+  }
+  .features li .tick {
+    width: 18px; height: 18px; flex-shrink: 0;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 900;
+  }
+  .emu .tick  { background: rgba(245,158,11,0.15); color: var(--gold); }
+  .opti .tick { background: rgba(56,189,248,0.12); color: var(--cyan); }
+
+  .mini-stats {
+    display: flex; gap: 12px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    margin-bottom: 22px;
+  }
+  .ms-item { flex: 1; }
+  .ms-label {
+    font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--txt-3); margin-bottom: 4px;
+  }
+  .ms-val { font-size: 22px; font-weight: 800; }
+
+  .card-btns { display: flex; gap: 10px; }
+  .btn-main {
+    flex: 1; padding: 11px; border-radius: var(--radius-sm);
+    font-weight: 800; font-size: 12.5px; border: none; cursor: pointer;
+    transition: all 0.2s; text-align: center; letter-spacing: 0.3px;
+  }
+  .btn-main.gold-btn {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+    color: #000; box-shadow: 0 4px 14px rgba(245,158,11,0.35);
+  }
+  .btn-main.gold-btn:hover { box-shadow: 0 6px 20px rgba(245,158,11,0.5); transform: translateY(-1px); }
+  .btn-main.cyan-btn {
+    background: linear-gradient(135deg, var(--cyan), var(--cyan-dim));
+    color: #000; box-shadow: 0 4px 14px rgba(56,189,248,0.3);
+  }
+  .btn-main.cyan-btn:hover { box-shadow: 0 6px 20px rgba(56,189,248,0.45); transform: translateY(-1px); }
+  .btn-ghost {
+    background: var(--surface-3); color: var(--txt-1);
+    border: 1px solid var(--border-hi); padding: 11px 16px;
+    border-radius: var(--radius-sm); font-weight: 600; font-size: 12.5px;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.06); }
+
+  /* ────────────────────────────────────────────────
+     LICENSE TABLE SECTION
+  ──────────────────────────────────────────────── */
+  #table-section { }
+
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
+  }
+  .section-header-left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+  #table-title {
+    font-size: 16px; font-weight: 800; color: var(--txt-1);
+  }
+
+  .pill-group {
+    display: flex; gap: 3px;
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 3px;
+  }
+  .pill-btn {
+    background: transparent; border: none; color: var(--txt-2);
+    font-size: 11.5px; font-weight: 600; padding: 5px 12px;
+    border-radius: 5px; cursor: pointer; transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .pill-btn:hover { color: var(--txt-1); background: var(--surface-3); }
+  .pill-btn.active { background: var(--surface-3); color: #fff; }
+
+  .search-wrap {
+    position: relative;
+  }
+  .search-wrap .ico {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--txt-3); font-size: 14px; pointer-events: none;
+  }
+  .search-input {
+    background: var(--surface-1); border: 1px solid var(--border);
+    color: var(--txt-1); padding: 8px 14px 8px 32px;
+    border-radius: var(--radius-sm); font-size: 12.5px; outline: none;
+    width: 260px; transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: rgba(56,189,248,0.5); }
+  .search-input::placeholder { color: var(--txt-3); }
+
+  .table-wrap {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    background: rgba(0,0,0,0.4);
+    color: var(--txt-2); font-size: 10.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.7px;
+    padding: 13px 18px; text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.025); }
+  tbody td { padding: 12px 18px; }
+
+  /* badges */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 999px;
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .b-online  { background: rgba(34,197,94,0.12);  color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+  .b-offline { background: var(--surface-3); color: var(--txt-3); }
+  .b-active  { background: rgba(56,189,248,0.12); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.2); }
+  .b-banned  { background: rgba(239,68,68,0.12);  color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+  .b-emu     { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+  .b-opti    { background: rgba(56,189,248,0.12); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.2); }
+  .b-vip     { background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(56,189,248,0.2)); color: #fff; border: 1px solid rgba(245,158,11,0.35); }
+
+  /* action buttons */
+  .act-btn {
+    padding: 5px 10px; border-radius: 6px; border: none;
+    font-size: 10.5px; font-weight: 700; cursor: pointer;
+    transition: opacity 0.15s; margin-right: 4px;
+  }
+  .act-btn:hover { opacity: 0.78; }
+  .a-kick   { background: #854d0e; color: #fef08a; }
+  .a-ban    { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+  .a-unban  { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
+  .a-reset  { background: var(--surface-3); color: var(--txt-1); }
+  .a-del    { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+
+  .key-mono {
+    font-family: 'Consolas', 'JetBrains Mono', monospace;
+    font-weight: 700; font-size: 12.5px;
+    letter-spacing: 0.5px;
+  }
+  .hwid-mono {
+    font-family: monospace; font-size: 11px; color: var(--txt-3);
+  }
+
+  .empty-row td {
+    text-align: center; padding: 40px;
+    color: var(--txt-2); font-size: 13px;
+  }
+
+  /* ────────────────────────────────────────────────
+     MODAL
+  ──────────────────────────────────────────────── */
+  .modal-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(10px);
+    z-index: 500;
+    align-items: center; justify-content: center;
+  }
+  .modal-backdrop.open { display: flex; }
+
+  .modal {
+    background: var(--surface-1);
+    border: 1px solid var(--border-hi);
+    border-radius: var(--radius-xl);
+    width: 90%; max-width: 500px;
+    padding: 28px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .modal-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 22px;
+  }
+  .modal-icon {
+    width: 42px; height: 42px;
+    background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25);
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .modal-title { font-size: 18px; font-weight: 800; }
+  .modal-sub { font-size: 11.5px; color: var(--txt-2); margin-top: 2px; }
+
+  .form-field { margin-bottom: 16px; }
+  .form-field label {
+    display: block; font-size: 11px; font-weight: 700;
+    color: var(--txt-2); text-transform: uppercase; letter-spacing: 0.7px;
+    margin-bottom: 7px;
+  }
+  .form-field select,
+  .form-field input {
+    width: 100%; background: var(--surface-2);
+    border: 1px solid var(--border-hi); border-radius: var(--radius-sm);
+    padding: 10px 14px; color: var(--txt-1); font-size: 13.5px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-field select:focus,
+  .form-field input:focus  { border-color: var(--gold); }
+  .form-field select option { background: var(--surface-2); }
+
+  .success-box {
+    display: none;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.25);
+    border-radius: var(--radius-md);
+    padding: 14px 16px; margin-top: 14px;
+    color: #86efac; font-size: 13px;
+    text-align: center;
+  }
+  .success-box .created-key {
+    font-family: monospace; font-size: 15px; font-weight: 800;
+    color: #4ade80; display: block; margin: 8px 0;
+    user-select: all; cursor: text;
+    word-break: break-all;
+  }
+  .success-box .copy-note { font-size: 11px; color: var(--txt-2); }
+
+  .modal-footer {
+    display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;
+  }
+  .btn-sm {
+    padding: 9px 20px; border-radius: var(--radius-sm);
+    font-weight: 700; font-size: 12.5px; border: none; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-sm.ghost { background: var(--surface-3); color: var(--txt-1); }
+  .btn-sm.ghost:hover { background: rgba(255,255,255,0.07); }
+  .btn-sm.primary {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
+    color: #000; box-shadow: 0 0 14px rgba(245,158,11,0.35);
+  }
+  .btn-sm.primary:hover { box-shadow: 0 0 22px rgba(245,158,11,0.55); }
+
+  /* ────────────────────────────────────────────────
+     LIVE PULSE
+  ──────────────────────────────────────────────── */
+  .pulse-dot {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: pulse 1.8s infinite;
+    margin-right: 6px; vertical-align: middle;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+  /* ── Responsive ── */
+  @media (max-width: 720px) {
+    .topbar { flex-wrap: wrap; top: 0; border-radius: var(--radius-lg); }
+    .nav-pills { display: none; }
+    .hub-header h2 { font-size: 22px; }
+    .suite-grid { grid-template-columns: 1fr; }
+    .search-input { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="wrapper">
+
+  <!-- ── TOP NAV ── -->
+  <nav class="topbar">
+    <div class="brand">
+      <div class="brand-logo-wrap">🎮</div>
+      <div class="brand-text">
+        <div class="brand-name">KNOXYY CENTRAL</div>
+        <div class="brand-tag">Unified Licensing Cloud Portal</div>
+      </div>
+    </div>
+
+    <div class="nav-pills">
+      <button class="nav-pill active" id="tab-portal" onclick="switchView('portal')">🌟 Suite Hub</button>
+      <button class="nav-pill" id="tab-emu"    onclick="switchView('emu')">🎮 Emulator</button>
+      <button class="nav-pill" id="tab-opti"   onclick="switchView('opti')">⚡ Optimizer</button>
+      <button class="nav-pill" id="tab-all"    onclick="switchView('all')">📊 All Licenses</button>
+    </div>
+
+    <button class="btn-create-key" onclick="openModal()">✦ Create License</button>
+  </nav>
+
+  <!-- ── STATS BAR ── -->
+  <div class="stats-bar">
+    <div class="stat-card gold">
+      <div class="stat-label">Emulator — Online</div>
+      <div class="stat-value gold" id="s-emu-online">0</div>
+      <div class="stat-sub"><span class="pulse-dot"></span>Live heartbeats</div>
+    </div>
+    <div class="stat-card gold">
+      <div class="stat-label">Emulator — Total Keys</div>
+      <div class="stat-value gold" id="s-emu-total">0</div>
+      <div class="stat-sub">Registered in DB</div>
+    </div>
+    <div class="stat-card cyan">
+      <div class="stat-label">Optimizer — Online</div>
+      <div class="stat-value cyan" id="s-opti-online">0</div>
+      <div class="stat-sub"><span class="pulse-dot" style="background:#38bdf8;box-shadow:0 0 6px #38bdf8;"></span>Live</div>
+    </div>
+    <div class="stat-card cyan">
+      <div class="stat-label">Optimizer — Total Keys</div>
+      <div class="stat-value cyan" id="s-opti-total">0</div>
+      <div class="stat-sub">Registered in DB</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-label">Total Online Now</div>
+      <div class="stat-value green" id="s-total-online">0</div>
+      <div class="stat-sub">Across all products</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-label">Banned / Revoked</div>
+      <div class="stat-value red" id="s-banned">0</div>
+      <div class="stat-sub">Blocked keys</div>
+    </div>
+  </div>
+
+  <!-- ── SUITE HUB ── -->
+  <div id="suite-selection">
+    <div class="hub-header">
+      <span class="eyebrow">Cloud License Manager</span>
+      <h2>Select Your Gaming Software Suite</h2>
+      <p>Manage live instances, generate hardware-locked keys, kick / ban users — all from one central dashboard.</p>
+    </div>
+
+    <div class="suite-grid">
+
+      <!-- EMULATOR CARD -->
+      <div class="suite-card emu">
+        <div class="top-strip"></div>
+        <div class="watermark">🎮</div>
+        <div class="card-top">
+          <div class="card-icon-wrap">🎮</div>
+          <div class="card-meta">
+            <h3>KNOXYY EMULATOR</h3>
+            <span class="card-badge badge-emu">v69.67 Gold Elite Edition</span>
+          </div>
+        </div>
+        <p class="card-desc">
+          Custom debloated Android VM built for Free Fire &amp; competitive mobile gaming with HWID hardware-bound licensing and cloud heartbeat guard.
+        </p>
+        <ul class="features">
+          <li><span class="tick">✓</span> P64 Lite Debloated Engine — 40% less RAM</li>
+          <li><span class="tick">✓</span> 450+ FPS Unlocked · ASUS ROG Phone 2 Profile</li>
+          <li><span class="tick">✓</span> DirectX / OpenGL Anti-Lag · Zero Input Delay</li>
+          <li><span class="tick">✓</span> HWID Security Guard · Real-time Heartbeat</li>
+        </ul>
+        <div class="mini-stats">
+          <div class="ms-item">
+            <div class="ms-label">Online Active</div>
+            <div class="ms-val" id="c-emu-online" style="color:var(--green)">0</div>
+          </div>
+          <div class="ms-item">
+            <div class="ms-label">Total Keys</div>
+            <div class="ms-val" id="c-emu-total" style="color:var(--gold)">0</div>
+          </div>
+        </div>
+        <div class="card-btns">
+          <button class="btn-main gold-btn" onclick="switchView('emu')">Manage Emulator →</button>
+          <button class="btn-ghost" onclick="openModal('emulator')">+ Key</button>
+        </div>
+      </div>
+
+      <!-- OPTIMIZER CARD -->
+      <div class="suite-card opti">
+        <div class="top-strip"></div>
+        <div class="watermark">⚡</div>
+        <div class="card-top">
+          <div class="card-icon-wrap">⚡</div>
+          <div class="card-meta">
+            <h3>KNOXYY PRO OPTIMIZER</h3>
+            <span class="card-badge badge-opti">Aim &amp; System Booster</span>
+          </div>
+        </div>
+        <p class="card-desc">
+          High-FPS Windows tuning suite: registry kernel tweaks, GPU max priority, 0ms aim mouse queue, and hardware-locked license protection.
+        </p>
+        <ul class="features">
+          <li><span class="tick">✓</span> 0ms Mouse Queue · Headshot Aim Precision</li>
+          <li><span class="tick">✓</span> GPU Dedicated Priority · Thread Responsiveness</li>
+          <li><span class="tick">✓</span> Zero-Background Bloat Memory Flush</li>
+          <li><span class="tick">✓</span> HWID Lock Protection Against Key Sharing</li>
+        </ul>
+        <div class="mini-stats">
+          <div class="ms-item">
+            <div class="ms-label">Online Active</div>
+            <div class="ms-val" id="c-opti-online" style="color:var(--green)">0</div>
+          </div>
+          <div class="ms-item">
+            <div class="ms-label">Total Keys</div>
+            <div class="ms-val" id="c-opti-total" style="color:var(--cyan)">0</div>
+          </div>
+        </div>
+        <div class="card-btns">
+          <button class="btn-main cyan-btn" onclick="switchView('opti')">Manage Optimizer →</button>
+          <button class="btn-ghost" onclick="openModal('optimizer')">+ Key</button>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /suite-selection -->
+
+  <!-- ── TABLE SECTION ── -->
+  <div id="table-section" style="display:none;">
+    <div class="section-header">
+      <div class="section-header-left">
+        <h3 id="table-title">All Licenses</h3>
+        <div class="pill-group">
+          <button class="pill-btn active" id="pill-all"  onclick="setFilter('all')">All</button>
+          <button class="pill-btn" id="pill-emu"          onclick="setFilter('emulator')">🎮 Emulator</button>
+          <button class="pill-btn" id="pill-opti"         onclick="setFilter('optimizer')">⚡ Optimizer</button>
+          <button class="pill-btn" id="pill-vip"          onclick="setFilter('vip')">🌟 VIP Pass</button>
+        </div>
+      </div>
+      <div class="search-wrap">
+        <span class="ico">🔍</span>
+        <input class="search-input" id="search-q" type="text"
+               placeholder="Search key, user, HWID…" oninput="renderTable()">
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>License Key</th>
+            <th>User</th>
+            <th>Product</th>
+            <th>Presence</th>
+            <th>Status</th>
+            <th>HWID Bound</th>
+            <th>Expires</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbl-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /wrapper -->
+
+<!-- ── CREATE LICENSE MODAL ── -->
+<div class="modal-backdrop" id="create-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-icon">✦</div>
+      <div>
+        <div class="modal-title">Generate License Key</div>
+        <div class="modal-sub">New hardware-locked key for any product</div>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label>Software Suite</label>
+      <select id="m-product">
+        <option value="emulator">🎮  Knoxyy Emulator  (v69.67 Gold Elite)</option>
+        <option value="optimizer">⚡  Knoxyy Pro Aim Optimizer</option>
+        <option value="all">🌟  All-in-One VIP Pass  (Both Suites)</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>Target Username</label>
+      <input type="text" id="m-username" placeholder="e.g. KnoxyyGamer">
+    </div>
+    <div class="form-field">
+      <label>License Duration</label>
+      <select id="m-days">
+        <option value="-1">♾️  Lifetime  (Permanent)</option>
+        <option value="30" selected>30 Days  (Standard)</option>
+        <option value="7">7 Days  (Trial)</option>
+        <option value="90">90 Days  (Quarterly)</option>
+        <option value="365">365 Days  (1 Year)</option>
+      </select>
+    </div>
+
+    <div class="success-box" id="m-success">
+      ✅ License key created &amp; copied to clipboard!
+      <span class="created-key" id="m-key-display"></span>
+      <span class="copy-note">Click the key above to select it</span>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-sm ghost" onclick="closeModal()">Close</button>
+      <button class="btn-sm primary" onclick="submitCreate()">⚡ Generate Key</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ───────── State ───────── */
+let licenses = [];
+let activeFilter = 'all';
+
+/* ───────── Animated background dots ───────── */
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, dots;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    initDots();
+  }
+
+  function initDots() {
+    dots = Array.from({length: 60}, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      r: Math.random() * 1.5 + 0.4,
+      dx: (Math.random() - 0.5) * 0.3,
+      dy: (Math.random() - 0.5) * 0.3,
+      col: Math.random() > 0.5 ? '#f59e0b' : '#38bdf8'
+    }));
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    dots.forEach(d => {
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+      ctx.fillStyle = d.col;
+      ctx.globalAlpha = 0.45;
+      ctx.fill();
+      d.x += d.dx; d.y += d.dy;
+      if (d.x < 0 || d.x > W) d.dx *= -1;
+      if (d.y < 0 || d.y > H) d.dy *= -1;
+    });
+    // connect nearby dots
+    for (let i = 0; i < dots.length; i++) {
+      for (let j = i+1; j < dots.length; j++) {
+        const dx = dots[i].x - dots[j].x, dy = dots[i].y - dots[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 120) {
+          ctx.beginPath();
+          ctx.moveTo(dots[i].x, dots[i].y);
+          ctx.lineTo(dots[j].x, dots[j].y);
+          ctx.strokeStyle = dots[i].col;
+          ctx.globalAlpha = 0.04 * (1 - dist/120);
+          ctx.lineWidth = 0.6;
+          ctx.stroke();
+        }
+      }
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  draw();
+})();
+
+/* ───────── Data loading ───────── */
+async function loadData() {
+  try {
+    const res  = await fetch('/api/v1/admin/list');
+    const data = await res.json();
+    licenses = data.licenses || [];
+    updateStats();
+    renderTable();
+  } catch(e) { console.warn('fetch fail', e); }
+}
+
+function isOnline(l) {
+  if (!l.last_seen) return false;
+  return (Date.now() - new Date(l.last_seen).getTime()) / 1000 < 75;
+}
+
+function updateStats() {
+  let emuOn=0, emuT=0, optiOn=0, optiT=0, banned=0, totalOn=0;
+  licenses.forEach(l => {
+    const p = (l.product||'emulator').toLowerCase();
+    const on = isOnline(l);
+    if (l.is_active === 0) banned++;
+    if (p==='emulator'||p==='all') { emuT++; if(on) emuOn++; }
+    if (p==='optimizer'||p==='all') { optiT++; if(on) optiOn++; }
+    if (on) totalOn++;
+  });
+  const dedup = new Set();
+  licenses.forEach(l => { if(isOnline(l)) dedup.add(l.key); });
+  totalOn = dedup.size;
+
+  const s = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  s('s-emu-online',emuOn); s('s-emu-total',emuT);
+  s('s-opti-online',optiOn); s('s-opti-total',optiT);
+  s('s-total-online',totalOn); s('s-banned',banned);
+  s('c-emu-online',emuOn); s('c-emu-total',emuT);
+  s('c-opti-online',optiOn); s('c-opti-total',optiT);
+}
+
+/* ───────── Table rendering ───────── */
+function renderTable() {
+  const tbody = document.getElementById('tbl-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  const q = (document.getElementById('search-q')?.value||'').toLowerCase();
+
+  const rows = licenses.filter(l => {
+    const p = (l.product||'emulator').toLowerCase();
+    if (activeFilter==='emulator' && p!=='emulator') return false;
+    if (activeFilter==='optimizer' && p!=='optimizer') return false;
+    if (activeFilter==='vip' && p!=='all') return false;
+    if (q) {
+      const match = [l.key,l.username,l.hwid].some(v => (v||'').toLowerCase().includes(q));
+      if (!match) return false;
+    }
+    return true;
+  });
+
+  if (!rows.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No licenses found.</td></tr>';
+    return;
+  }
+
+  rows.forEach(l => {
+    const on = isOnline(l);
+    const p  = (l.product||'emulator').toLowerCase();
+    let prodBadge, keyCol;
+    if (p==='optimizer') {
+      prodBadge = '<span class="badge b-opti">⚡ Optimizer</span>'; keyCol='#7dd3fc';
+    } else if (p==='all') {
+      prodBadge = '<span class="badge b-vip">🌟 VIP Both</span>';   keyCol='#fbbf24';
+    } else {
+      prodBadge = '<span class="badge b-emu">🎮 Emulator</span>';    keyCol='#fbbf24';
+    }
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="key-mono" style="color:${keyCol}">${escHtml(l.key)}</span></td>
+      <td style="font-weight:600">${escHtml(l.username||'—')}</td>
+      <td>${prodBadge}</td>
+      <td><span class="badge ${on?'b-online':'b-offline'}">${on?'● ONLINE':'Offline'}</span></td>
+      <td><span class="badge ${l.is_active?'b-active':'b-banned'}">${l.is_active?'Active':'Banned'}</span></td>
+      <td><span class="hwid-mono">${l.hwid ? l.hwid.substring(0,16)+'…' : '(Unbound)'}</span></td>
+      <td style="font-size:12px;color:var(--txt-2)">${escHtml(l.expires_at||'—')}</td>
+      <td>
+        ${on ? `<button class="act-btn a-kick" onclick="doAction('kick','${escAttr(l.key)}')">Kick</button>` : ''}
+        ${l.is_active
+          ? `<button class="act-btn a-ban"   onclick="doAction('ban','${escAttr(l.key)}')">Ban</button>`
+          : `<button class="act-btn a-unban" onclick="doAction('unban','${escAttr(l.key)}')">Unban</button>`
+        }
+        <button class="act-btn a-reset" onclick="doAction('reset_hwid','${escAttr(l.key)}')">HWID</button>
+        <button class="act-btn a-del"   onclick="doAction('delete','${escAttr(l.key)}')">Del</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ───────── View switching ───────── */
+function switchView(v) {
+  document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
+  const tabSuite = document.getElementById('suite-selection');
+  const tabTbl   = document.getElementById('table-section');
+
+  if (v==='portal') {
+    tabSuite.style.display='block'; tabTbl.style.display='none';
+    document.getElementById('tab-portal').classList.add('active');
+    setFilter('all');
+  } else {
+    tabSuite.style.display='none'; tabTbl.style.display='block';
+    const map = {emu:'tab-emu', opti:'tab-opti', all:'tab-all'};
+    document.getElementById(map[v]||'tab-all')?.classList.add('active');
+    const titles = {emu:'Knoxyy Emulator Licenses', opti:'Knoxyy Pro Optimizer Licenses', all:'All Licenses'};
+    document.getElementById('table-title').textContent = titles[v]||'All Licenses';
+    if (v==='emu')  setFilter('emulator',false);
+    else if(v==='opti') setFilter('optimizer',false);
+    else setFilter('all',false);
+  }
+}
+
+function setFilter(f, re=true) {
+  activeFilter = f;
+  document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+  const map = {all:'pill-all', emulator:'pill-emu', optimizer:'pill-opti', vip:'pill-vip'};
+  document.getElementById(map[f]||'pill-all')?.classList.add('active');
+  if (re) renderTable();
+}
+
+/* ───────── Modal ───────── */
+function openModal(preselect=null) {
+  document.getElementById('m-success').style.display='none';
+  if (preselect) document.getElementById('m-product').value=preselect;
+  document.getElementById('create-modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('create-modal').classList.remove('open');
+  loadData();
+}
+
+async function submitCreate() {
+  const prod  = document.getElementById('m-product').value;
+  const user  = document.getElementById('m-username').value.trim() || 'User';
+  const days  = parseInt(document.getElementById('m-days').value);
+  const res   = await fetch('/api/v1/admin/create_key', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({product:prod, username:user, days})
+  });
+  const data = await res.json();
+  if (data.success) {
+    document.getElementById('m-key-display').textContent = data.key;
+    document.getElementById('m-success').style.display='block';
+    navigator.clipboard.writeText(data.key).catch(()=>{});
+    loadData();
+  }
+}
+
+/* ───────── Admin action ───────── */
+async function doAction(action, key) {
+  const safe = {'kick':'Kick','ban':'Ban','unban':'Unban','reset_hwid':'Reset HWID','delete':'DELETE'};
+  if (!confirm(`${safe[action]||action} license:\n${key}`)) return;
+  await fetch('/api/v1/admin/action', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({action, key})
+  });
+  loadData();
+}
+
+/* ───────── Helpers ───────── */
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escAttr(s) {
+  return String(s||'').replace(/'/g,"\\'");
+}
+
+/* ───────── Init ───────── */
+loadData();
+setInterval(loadData, 5000);
+</script>
+</body>
+</html>
