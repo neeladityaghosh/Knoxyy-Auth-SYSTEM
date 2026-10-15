@@ -3,746 +3,956 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Knoxyy Central — Gaming Suite Portal</title>
+<title>Knoxyy Central — Elite Gaming Suite</title>
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <style>
-  /* ────────────────────────────────────────────────
-     TOKENS & RESET
-  ──────────────────────────────────────────────── */
-  :root {
-    --bg:          #07090f;
-    --surface-1:   #0d1117;
-    --surface-2:   #161b27;
-    --surface-3:   #1c2436;
-    --border:      rgba(255,255,255,0.06);
-    --border-hi:   rgba(255,255,255,0.14);
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap');
 
-    --gold:        #f59e0b;
-    --gold-dim:    #d97706;
-    --gold-glow:   rgba(245,158,11,0.30);
-    --cyan:        #38bdf8;
-    --cyan-dim:    #0284c7;
-    --cyan-glow:   rgba(56,189,248,0.25);
-    --green:       #22c55e;
-    --red:         #ef4444;
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════ */
+:root {
+  --bg-deep:   #04060d;
+  --bg-base:   #070b14;
+  --s1:        #0c1120;
+  --s2:        #111827;
+  --s3:        #1a2235;
 
-    --txt-1:  #f1f5f9;
-    --txt-2:  #94a3b8;
-    --txt-3:  #475569;
+  --border:    rgba(255,255,255,0.055);
+  --border-hi: rgba(255,255,255,0.13);
+  --border-gd: rgba(245,158,11,0.35);
+  --border-cy: rgba(56,189,248,0.3);
 
-    --radius-sm:  8px;
-    --radius-md:  12px;
-    --radius-lg:  18px;
-    --radius-xl:  24px;
-  }
+  --gold:     #f59e0b;
+  --gold-lt:  #fbbf24;
+  --gold-dk:  #d97706;
+  --gold-gl:  rgba(245,158,11,0.25);
+  --gold-gl2: rgba(245,158,11,0.08);
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  --cyan:     #38bdf8;
+  --cyan-lt:  #7dd3fc;
+  --cyan-dk:  #0284c7;
+  --cyan-gl:  rgba(56,189,248,0.22);
+  --cyan-gl2: rgba(56,189,248,0.07);
 
-  body {
-    background: var(--bg);
-    color: var(--txt-1);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  --grn:  #22c55e;
+  --grn-gl: rgba(34,197,94,0.2);
+  --red:  #ef4444;
+  --red-gl: rgba(239,68,68,0.2);
+  --pur:  #a855f7;
+  --pur-gl: rgba(168,85,247,0.2);
 
-  /* ── Animated background canvas ── */
-  #bg-canvas {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0.5;
-  }
+  --t1: #f0f6ff;
+  --t2: #8899bb;
+  --t3: #3d5070;
 
-  /* ── Layout wrapper ── */
-  .wrapper {
-    position: relative;
-    z-index: 1;
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 20px 24px 60px;
-  }
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+  --r-2xl:32px;
+}
 
-  /* ────────────────────────────────────────────────
-     TOP NAV
-  ──────────────────────────────────────────────── */
-  .topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 14px 20px;
-    background: rgba(13,17,23,0.75);
-    backdrop-filter: blur(20px) saturate(160%);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    margin-bottom: 28px;
-    position: sticky;
-    top: 20px;
-    z-index: 100;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
-  }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg-deep);
+  color: var(--t1);
+  font-family: 'Inter', -apple-system, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
-  }
-  .brand-logo-wrap {
-    width: 42px; height: 42px;
-    background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(56,189,248,0.1));
-    border: 1px solid rgba(245,158,11,0.3);
-    border-radius: var(--radius-md);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-  }
-  .brand-text { line-height: 1.2; }
-  .brand-name {
-    font-size: 15px; font-weight: 800; letter-spacing: 0.5px;
-    background: linear-gradient(90deg, #f8fafc 30%, var(--gold));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .brand-tag {
-    font-size: 10px; font-weight: 600; color: var(--txt-2);
-    letter-spacing: 1px; text-transform: uppercase;
-  }
+/* ═══════════════════════════════════════════
+   BACKGROUND — AURORA + GRID
+═══════════════════════════════════════════ */
+.bg-layer {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+}
 
-  .nav-pills {
-    display: flex; gap: 4px; align-items: center;
-    background: var(--surface-1);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 4px;
-  }
-  .nav-pill {
-    background: transparent; color: var(--txt-2);
-    border: none; padding: 7px 14px; border-radius: var(--radius-sm);
-    font-weight: 600; font-size: 12.5px; cursor: pointer;
-    transition: all 0.18s ease; white-space: nowrap;
-  }
-  .nav-pill:hover { color: var(--txt-1); background: var(--surface-3); }
-  .nav-pill.active {
-    background: var(--surface-3); color: #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
-  }
+/* Animated aurora orbs */
+.aurora {
+  position: absolute; inset: 0; overflow: hidden;
+}
+.aurora-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: drift 20s ease-in-out infinite alternate;
+  opacity: 0.35;
+}
+.ao1 {
+  width: 600px; height: 500px;
+  background: radial-gradient(circle, rgba(245,158,11,0.5), transparent 65%);
+  top: -200px; left: -150px;
+  animation-duration: 22s;
+}
+.ao2 {
+  width: 700px; height: 600px;
+  background: radial-gradient(circle, rgba(56,189,248,0.4), transparent 65%);
+  top: -100px; right: -200px;
+  animation-duration: 28s; animation-delay: -8s;
+}
+.ao3 {
+  width: 500px; height: 400px;
+  background: radial-gradient(circle, rgba(168,85,247,0.35), transparent 65%);
+  bottom: 100px; left: 30%;
+  animation-duration: 18s; animation-delay: -14s;
+}
+.ao4 {
+  width: 400px; height: 350px;
+  background: radial-gradient(circle, rgba(34,197,94,0.2), transparent 65%);
+  bottom: -100px; right: 10%;
+  animation-duration: 25s; animation-delay: -5s;
+}
+@keyframes drift {
+  0%   { transform: translate(0,0) scale(1); }
+  33%  { transform: translate(60px,-40px) scale(1.1); }
+  66%  { transform: translate(-30px,50px) scale(0.95); }
+  100% { transform: translate(40px,20px) scale(1.05); }
+}
 
-  .btn-create-key {
-    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
-    color: #000; font-weight: 800; font-size: 12.5px;
-    border: none; padding: 9px 18px; border-radius: var(--radius-sm);
-    cursor: pointer; transition: all 0.2s; white-space: nowrap;
-    box-shadow: 0 0 16px var(--gold-glow);
-    flex-shrink: 0;
-  }
-  .btn-create-key:hover {
-    background: linear-gradient(135deg, #fbbf24, var(--gold));
-    box-shadow: 0 0 24px var(--gold-glow);
-    transform: translateY(-1px);
-  }
+/* Dot grid */
+.grid-dots {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+}
 
-  /* ────────────────────────────────────────────────
-     HERO STATS BAR
-  ──────────────────────────────────────────────── */
-  .stats-bar {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
-    margin-bottom: 28px;
-  }
-  .stat-card {
-    background: var(--surface-1);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 16px 20px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.2s;
-  }
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 2px;
-  }
-  .stat-card.gold::before  { background: linear-gradient(90deg, var(--gold), transparent); }
-  .stat-card.cyan::before  { background: linear-gradient(90deg, var(--cyan), transparent); }
-  .stat-card.green::before { background: linear-gradient(90deg, var(--green), transparent); }
-  .stat-card.red::before   { background: linear-gradient(90deg, var(--red), transparent); }
-  .stat-card:hover { border-color: var(--border-hi); }
+/* Scanline subtle overlay */
+.scanline {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.035) 2px,
+    rgba(0,0,0,0.035) 4px
+  );
+}
 
-  .stat-label {
-    font-size: 10.5px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.8px; color: var(--txt-2); margin-bottom: 6px;
-  }
-  .stat-value {
-    font-size: 26px; font-weight: 800; line-height: 1;
-  }
-  .stat-value.gold  { color: var(--gold); }
-  .stat-value.cyan  { color: var(--cyan); }
-  .stat-value.green { color: var(--green); }
-  .stat-value.red   { color: var(--red); }
-  .stat-sub { font-size: 11px; color: var(--txt-3); margin-top: 4px; }
+/* ═══════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════ */
+.page {
+  position: relative; z-index: 1;
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 20px 28px 80px;
+}
 
-  /* ────────────────────────────────────────────────
-     SUITE SELECTION HUB
-  ──────────────────────────────────────────────── */
-  #suite-selection { margin-bottom: 30px; }
+/* ═══════════════════════════════════════════
+   TOP NAVIGATION
+═══════════════════════════════════════════ */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 18px;
+  margin-bottom: 32px;
+  position: sticky; top: 16px; z-index: 200;
 
-  .hub-header {
-    text-align: center;
-    margin-bottom: 32px;
-  }
-  .hub-header .eyebrow {
-    display: inline-block;
-    background: rgba(245,158,11,0.12);
-    color: var(--gold);
-    border: 1px solid rgba(245,158,11,0.25);
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    padding: 5px 14px; border-radius: 999px;
-    margin-bottom: 16px;
-  }
-  .hub-header h2 {
-    font-size: 30px; font-weight: 900;
-    background: linear-gradient(135deg, #f8fafc 40%, #94a3b8);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    margin-bottom: 10px;
-  }
-  .hub-header p { color: var(--txt-2); font-size: 14px; max-width: 480px; margin: 0 auto; line-height: 1.6; }
+  background: rgba(7, 11, 20, 0.72);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-xl);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.03) inset,
+    0 8px 40px rgba(0,0,0,0.6),
+    0 0 60px rgba(245,158,11,0.04);
+}
 
-  .suite-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-    gap: 20px;
-    max-width: 1050px;
-    margin: 0 auto;
-  }
+/* Brand */
+.brand {
+  display: flex; align-items: center; gap: 13px; flex-shrink: 0;
+}
+.brand-gem {
+  position: relative;
+  width: 46px; height: 46px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(245,158,11,0.18), rgba(56,189,248,0.08));
+  border: 1px solid rgba(245,158,11,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 0 18px rgba(245,158,11,0.2), inset 0 1px 0 rgba(255,255,255,0.07);
+}
+.brand-gem::after {
+  content: '';
+  position: absolute; inset: -1px;
+  border-radius: 15px;
+  background: linear-gradient(135deg, rgba(245,158,11,0.4), transparent, rgba(56,189,248,0.2));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  padding: 1px;
+}
+.brand-words { line-height: 1.25; }
+.brand-name {
+  font-size: 16px; font-weight: 900; letter-spacing: 0.3px;
+  background: linear-gradient(90deg, #fff 20%, #fbbf24 60%, #38bdf8 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.brand-tagline {
+  font-size: 9.5px; font-weight: 600; color: var(--t3);
+  text-transform: uppercase; letter-spacing: 1.2px;
+}
 
-  .suite-card {
-    background: var(--surface-1);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    padding: 30px;
-    display: flex; flex-direction: column;
-    position: relative; overflow: hidden;
-    transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
-    cursor: default;
-  }
-  .suite-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    opacity: 0;
-    transition: opacity 0.35s;
-    pointer-events: none;
-  }
-  .suite-card.emu::after  { box-shadow: inset 0 0 60px rgba(245,158,11,0.08); }
-  .suite-card.opti::after { box-shadow: inset 0 0 60px rgba(56,189,248,0.08); }
+/* Nav tabs */
+.nav-center {
+  display: flex; align-items: center;
+  gap: 2px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 4px;
+}
+.nav-tab {
+  background: transparent; border: none;
+  color: var(--t2); font-weight: 600; font-size: 12.5px;
+  padding: 8px 16px; border-radius: var(--r-sm);
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  position: relative;
+}
+.nav-tab:hover { color: var(--t1); background: rgba(255,255,255,0.05); }
+.nav-tab.active {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+}
 
-  .suite-card:hover {
-    transform: translateY(-6px);
-    border-color: var(--border-hi);
-  }
-  .suite-card:hover::after { opacity: 1; }
-  .suite-card.emu:hover  { border-color: rgba(245,158,11,0.45); box-shadow: 0 20px 50px rgba(245,158,11,0.12); }
-  .suite-card.opti:hover { border-color: rgba(56,189,248,0.45);  box-shadow: 0 20px 50px rgba(56,189,248,0.12); }
+/* Create button */
+.btn-new-key {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dk));
+  color: #000; font-weight: 800; font-size: 12.5px; letter-spacing: 0.3px;
+  border: none; padding: 10px 20px; border-radius: var(--r-sm);
+  cursor: pointer; flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.15) inset, 0 4px 20px var(--gold-gl);
+  transition: all 0.25s;
+}
+.btn-new-key::before {
+  content: '';
+  position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  transition: left 0.4s;
+}
+.btn-new-key:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--gold-gl); }
+.btn-new-key:hover::before { left: 100%; }
 
-  /* glow strip top */
-  .suite-card .top-strip {
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 3px;
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-  }
-  .suite-card.emu  .top-strip { background: linear-gradient(90deg, var(--gold), transparent 70%); }
-  .suite-card.opti .top-strip { background: linear-gradient(90deg, var(--cyan), transparent 70%); }
+/* ═══════════════════════════════════════════
+   HERO SECTION
+═══════════════════════════════════════════ */
+.hero {
+  text-align: center;
+  padding: 20px 0 42px;
+  position: relative;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(245,158,11,0.09);
+  border: 1px solid rgba(245,158,11,0.22);
+  color: var(--gold-lt); font-size: 11px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 6px 16px; border-radius: 999px;
+  margin-bottom: 22px;
+}
+.hero-eyebrow .dot {
+  width: 6px; height: 6px; background: var(--grn);
+  border-radius: 50%; box-shadow: 0 0 8px var(--grn);
+  animation: blink 1.5s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  /* floating corner watermark */
-  .suite-card .watermark {
-    position: absolute;
-    right: -14px; top: -14px;
-    font-size: 100px; opacity: 0.03;
-    line-height: 1; user-select: none;
-  }
+.hero-title {
+  font-size: clamp(36px, 5vw, 58px);
+  font-weight: 900; line-height: 1.08; letter-spacing: -1.5px;
+  margin-bottom: 18px;
+}
+.hero-title .line1 {
+  display: block;
+  background: linear-gradient(135deg, #fff 30%, #e2e8f0 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-title .line2 {
+  display: block;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-lt) 40%, var(--cyan) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  color: var(--t2); font-size: 15px; line-height: 1.7;
+  max-width: 520px; margin: 0 auto 36px;
+}
 
-  .card-top {
-    display: flex; align-items: flex-start; gap: 16px;
-    margin-bottom: 20px;
-  }
-  .card-icon-wrap {
-    width: 58px; height: 58px; flex-shrink: 0;
-    border-radius: var(--radius-md);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 28px;
-  }
-  .emu .card-icon-wrap  { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.2); }
-  .opti .card-icon-wrap { background: rgba(56,189,248,0.10); border: 1px solid rgba(56,189,248,0.2); }
+/* ═══════════════════════════════════════════
+   STATS ROW
+═══════════════════════════════════════════ */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  margin-bottom: 36px;
+}
+@media(max-width:900px){ .stats-row{ grid-template-columns: repeat(3,1fr); } }
+@media(max-width:540px){ .stats-row{ grid-template-columns: repeat(2,1fr); } }
 
-  .card-meta { flex: 1; }
-  .card-meta h3 { font-size: 19px; font-weight: 800; margin-bottom: 4px; }
-  .card-badge {
-    display: inline-block;
-    font-size: 10px; font-weight: 700;
-    padding: 3px 9px; border-radius: 999px;
-    letter-spacing: 0.5px; text-transform: uppercase;
-  }
-  .badge-emu  { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
-  .badge-opti { background: rgba(56,189,248,0.12); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.25); }
+.stat-tile {
+  position: relative; overflow: hidden;
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 18px 20px;
+  transition: all 0.3s;
+}
+.stat-tile::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  transition: opacity 0.3s;
+}
+.stat-tile:hover { border-color: var(--border-hi); transform: translateY(-2px); }
 
-  .card-desc {
-    color: var(--txt-2); font-size: 13px; line-height: 1.65;
-    margin-bottom: 20px;
-  }
+.st-gold::before  { background: linear-gradient(90deg,var(--gold),transparent); }
+.st-cyan::before  { background: linear-gradient(90deg,var(--cyan),transparent); }
+.st-grn::before   { background: linear-gradient(90deg,var(--grn),transparent); }
+.st-red::before   { background: linear-gradient(90deg,var(--red),transparent); }
+.st-pur::before   { background: linear-gradient(90deg,var(--pur),transparent); }
 
-  .features {
-    list-style: none; display: flex; flex-direction: column; gap: 8px;
-    margin-bottom: 24px;
-  }
-  .features li {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 13px; color: #cbd5e1;
-  }
-  .features li .tick {
-    width: 18px; height: 18px; flex-shrink: 0;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px; font-weight: 900;
-  }
-  .emu .tick  { background: rgba(245,158,11,0.15); color: var(--gold); }
-  .opti .tick { background: rgba(56,189,248,0.12); color: var(--cyan); }
+.stat-tile .bg-icon {
+  position: absolute; right: 10px; bottom: 6px;
+  font-size: 38px; opacity: 0.07; user-select: none;
+}
+.stat-label {
+  font-size: 9.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.9px; color: var(--t3); margin-bottom: 8px;
+}
+.stat-num {
+  font-size: 28px; font-weight: 900; line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.stat-num.c-gold { color: var(--gold); }
+.stat-num.c-cyan { color: var(--cyan); }
+.stat-num.c-grn  { color: var(--grn);  }
+.stat-num.c-red  { color: var(--red);  }
+.stat-num.c-pur  { color: var(--pur);  }
+.stat-hint {
+  font-size: 11px; color: var(--t3); margin-top: 5px;
+  display: flex; align-items: center; gap: 5px;
+}
 
-  .mini-stats {
-    display: flex; gap: 12px;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    padding: 14px 18px;
-    margin-bottom: 22px;
-  }
-  .ms-item { flex: 1; }
-  .ms-label {
-    font-size: 9.5px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.8px; color: var(--txt-3); margin-bottom: 4px;
-  }
-  .ms-val { font-size: 22px; font-weight: 800; }
+/* ═══════════════════════════════════════════
+   SUITE HUB CARDS
+═══════════════════════════════════════════ */
+.hub-section { margin-bottom: 32px; }
 
-  .card-btns { display: flex; gap: 10px; }
-  .btn-main {
-    flex: 1; padding: 11px; border-radius: var(--radius-sm);
-    font-weight: 800; font-size: 12.5px; border: none; cursor: pointer;
-    transition: all 0.2s; text-align: center; letter-spacing: 0.3px;
-  }
-  .btn-main.gold-btn {
-    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
-    color: #000; box-shadow: 0 4px 14px rgba(245,158,11,0.35);
-  }
-  .btn-main.gold-btn:hover { box-shadow: 0 6px 20px rgba(245,158,11,0.5); transform: translateY(-1px); }
-  .btn-main.cyan-btn {
-    background: linear-gradient(135deg, var(--cyan), var(--cyan-dim));
-    color: #000; box-shadow: 0 4px 14px rgba(56,189,248,0.3);
-  }
-  .btn-main.cyan-btn:hover { box-shadow: 0 6px 20px rgba(56,189,248,0.45); transform: translateY(-1px); }
-  .btn-ghost {
-    background: var(--surface-3); color: var(--txt-1);
-    border: 1px solid var(--border-hi); padding: 11px 16px;
-    border-radius: var(--radius-sm); font-weight: 600; font-size: 12.5px;
-    cursor: pointer; transition: all 0.2s; white-space: nowrap;
-  }
-  .btn-ghost:hover { background: rgba(255,255,255,0.06); }
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 22px;
+}
+@media(max-width:820px){ .cards-grid{ grid-template-columns: 1fr; } }
 
-  /* ────────────────────────────────────────────────
-     LICENSE TABLE SECTION
-  ──────────────────────────────────────────────── */
-  #table-section { }
+.product-card {
+  position: relative; overflow: hidden;
+  background: var(--s1);
+  border-radius: var(--r-2xl);
+  border: 1px solid var(--border);
+  padding: 32px;
+  transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+  cursor: default;
+}
 
-  .section-header {
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
-  }
-  .section-header-left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+/* Glow border on hover */
+.product-card::before {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  opacity: 0; transition: opacity 0.4s;
+  pointer-events: none;
+}
+.card-emu::before  { box-shadow: inset 0 0 0 1px rgba(245,158,11,0.5), 0 0 60px rgba(245,158,11,0.08); }
+.card-opti::before { box-shadow: inset 0 0 0 1px rgba(56,189,248,0.45), 0 0 60px rgba(56,189,248,0.07); }
 
-  #table-title {
-    font-size: 16px; font-weight: 800; color: var(--txt-1);
-  }
+.product-card:hover { transform: translateY(-8px); }
+.product-card:hover::before { opacity: 1; }
+.card-emu:hover  { box-shadow: 0 32px 80px rgba(245,158,11,0.15); }
+.card-opti:hover { box-shadow: 0 32px 80px rgba(56,189,248,0.12); }
 
-  .pill-group {
-    display: flex; gap: 3px;
-    background: var(--surface-1); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 3px;
-  }
-  .pill-btn {
-    background: transparent; border: none; color: var(--txt-2);
-    font-size: 11.5px; font-weight: 600; padding: 5px 12px;
-    border-radius: 5px; cursor: pointer; transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .pill-btn:hover { color: var(--txt-1); background: var(--surface-3); }
-  .pill-btn.active { background: var(--surface-3); color: #fff; }
+/* Noise texture */
+.product-card::after {
+  content: '';
+  position: absolute; inset: 0; border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.3; pointer-events: none;
+}
 
-  .search-wrap {
-    position: relative;
-  }
-  .search-wrap .ico {
-    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
-    color: var(--txt-3); font-size: 14px; pointer-events: none;
-  }
-  .search-input {
-    background: var(--surface-1); border: 1px solid var(--border);
-    color: var(--txt-1); padding: 8px 14px 8px 32px;
-    border-radius: var(--radius-sm); font-size: 12.5px; outline: none;
-    width: 260px; transition: border-color 0.2s;
-  }
-  .search-input:focus { border-color: rgba(56,189,248,0.5); }
-  .search-input::placeholder { color: var(--txt-3); }
+/* Large glow orb behind card */
+.card-orb {
+  position: absolute;
+  width: 350px; height: 350px; border-radius: 50%;
+  filter: blur(80px); opacity: 0.12;
+  top: -100px; right: -100px;
+  pointer-events: none; z-index: 0;
+  transition: opacity 0.4s;
+}
+.card-emu .card-orb  { background: var(--gold); }
+.card-opti .card-orb { background: var(--cyan); }
+.product-card:hover .card-orb { opacity: 0.2; }
 
-  .table-wrap {
-    background: var(--surface-1);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-  }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead th {
-    background: rgba(0,0,0,0.4);
-    color: var(--txt-2); font-size: 10.5px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.7px;
-    padding: 13px 18px; text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
-  tbody tr {
-    border-bottom: 1px solid var(--border);
-    transition: background 0.12s;
-  }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: rgba(255,255,255,0.025); }
-  tbody td { padding: 12px 18px; }
+/* Accent stripe */
+.card-stripe {
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  border-radius: var(--r-2xl) var(--r-2xl) 0 0;
+}
+.card-emu  .card-stripe { background: linear-gradient(90deg, var(--gold), var(--gold-lt), transparent 70%); }
+.card-opti .card-stripe { background: linear-gradient(90deg, var(--cyan), var(--cyan-lt), transparent 70%); }
 
-  /* badges */
-  .badge {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 3px 9px; border-radius: 999px;
-    font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
-  }
-  .b-online  { background: rgba(34,197,94,0.12);  color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
-  .b-offline { background: var(--surface-3); color: var(--txt-3); }
-  .b-active  { background: rgba(56,189,248,0.12); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.2); }
-  .b-banned  { background: rgba(239,68,68,0.12);  color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
-  .b-emu     { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
-  .b-opti    { background: rgba(56,189,248,0.12); color: #7dd3fc; border: 1px solid rgba(56,189,248,0.2); }
-  .b-vip     { background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(56,189,248,0.2)); color: #fff; border: 1px solid rgba(245,158,11,0.35); }
+/* Card content z-index */
+.card-body { position: relative; z-index: 1; }
 
-  /* action buttons */
-  .act-btn {
-    padding: 5px 10px; border-radius: 6px; border: none;
-    font-size: 10.5px; font-weight: 700; cursor: pointer;
-    transition: opacity 0.15s; margin-right: 4px;
-  }
-  .act-btn:hover { opacity: 0.78; }
-  .a-kick   { background: #854d0e; color: #fef08a; }
-  .a-ban    { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
-  .a-unban  { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
-  .a-reset  { background: var(--surface-3); color: var(--txt-1); }
-  .a-del    { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+/* Card header */
+.card-head { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 22px; }
+.card-icon-box {
+  width: 64px; height: 64px; flex-shrink: 0;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.card-emu  .card-icon-box { background: linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.05)); border: 1px solid rgba(245,158,11,0.25); }
+.card-opti .card-icon-box { background: linear-gradient(135deg,rgba(56,189,248,0.18),rgba(56,189,248,0.05)); border: 1px solid rgba(56,189,248,0.22); }
 
-  .key-mono {
-    font-family: 'Consolas', 'JetBrains Mono', monospace;
-    font-weight: 700; font-size: 12.5px;
-    letter-spacing: 0.5px;
-  }
-  .hwid-mono {
-    font-family: monospace; font-size: 11px; color: var(--txt-3);
-  }
+.card-titles h3 {
+  font-size: 20px; font-weight: 900; letter-spacing: -0.3px; margin-bottom: 6px;
+}
+.card-pill {
+  display: inline-block;
+  font-size: 10px; font-weight: 800;
+  padding: 3px 10px; border-radius: 999px;
+  text-transform: uppercase; letter-spacing: 0.6px;
+}
+.pill-emu  { background: rgba(245,158,11,0.15); color: var(--gold-lt); border: 1px solid rgba(245,158,11,0.3); }
+.pill-opti { background: rgba(56,189,248,0.12); color: var(--cyan-lt); border: 1px solid rgba(56,189,248,0.25); }
 
-  .empty-row td {
-    text-align: center; padding: 40px;
-    color: var(--txt-2); font-size: 13px;
-  }
+.card-desc {
+  color: var(--t2); font-size: 13.5px; line-height: 1.7; margin-bottom: 22px;
+}
 
-  /* ────────────────────────────────────────────────
-     MODAL
-  ──────────────────────────────────────────────── */
-  .modal-backdrop {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.75);
-    backdrop-filter: blur(10px);
-    z-index: 500;
-    align-items: center; justify-content: center;
-  }
-  .modal-backdrop.open { display: flex; }
+/* Features */
+.feat-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 26px; }
+.feat-list li {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 13.5px; color: #b8c8e0;
+}
+.feat-check {
+  width: 22px; height: 22px; flex-shrink: 0;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 900;
+}
+.card-emu  .feat-check { background: rgba(245,158,11,0.14); color: var(--gold); border: 1px solid rgba(245,158,11,0.25); }
+.card-opti .feat-check { background: rgba(56,189,248,0.12); color: var(--cyan); border: 1px solid rgba(56,189,248,0.22); }
 
-  .modal {
-    background: var(--surface-1);
-    border: 1px solid var(--border-hi);
-    border-radius: var(--radius-xl);
-    width: 90%; max-width: 500px;
-    padding: 28px;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.7);
-    animation: slideUp 0.25s ease;
-  }
-  @keyframes slideUp {
-    from { transform: translateY(20px); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
-  }
+/* Stat mini row */
+.mini-stat-row {
+  display: flex; gap: 1px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.mini-stat {
+  flex: 1; padding: 14px 18px;
+  background: rgba(255,255,255,0.016);
+}
+.mini-stat:first-child { border-right: 1px solid var(--border); }
+.ms-label { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.9px; color: var(--t3); margin-bottom: 5px; }
+.ms-val { font-size: 24px; font-weight: 900; }
 
-  .modal-header {
-    display: flex; align-items: center; gap: 12px; margin-bottom: 22px;
-  }
-  .modal-icon {
-    width: 42px; height: 42px;
-    background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25);
-    border-radius: var(--radius-md);
-    display: flex; align-items: center; justify-content: center; font-size: 20px;
-  }
-  .modal-title { font-size: 18px; font-weight: 800; }
-  .modal-sub { font-size: 11.5px; color: var(--txt-2); margin-top: 2px; }
+/* Buttons */
+.card-actions { display: flex; gap: 10px; }
+.btn-card-primary {
+  flex: 1; position: relative; overflow: hidden;
+  padding: 13px 20px; border-radius: var(--r-md);
+  font-weight: 800; font-size: 13px; border: none; cursor: pointer;
+  transition: all 0.25s; text-align: center; letter-spacing: 0.2px;
+}
+.btn-card-primary::before {
+  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.45s;
+}
+.btn-card-primary:hover::before { left: 100%; }
+.btn-card-primary:hover { transform: translateY(-2px); }
 
-  .form-field { margin-bottom: 16px; }
-  .form-field label {
-    display: block; font-size: 11px; font-weight: 700;
-    color: var(--txt-2); text-transform: uppercase; letter-spacing: 0.7px;
-    margin-bottom: 7px;
-  }
-  .form-field select,
-  .form-field input {
-    width: 100%; background: var(--surface-2);
-    border: 1px solid var(--border-hi); border-radius: var(--radius-sm);
-    padding: 10px 14px; color: var(--txt-1); font-size: 13.5px; outline: none;
-    transition: border-color 0.2s;
-  }
-  .form-field select:focus,
-  .form-field input:focus  { border-color: var(--gold); }
-  .form-field select option { background: var(--surface-2); }
+.btn-emu-p {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dk));
+  color: #000;
+  box-shadow: 0 4px 20px rgba(245,158,11,0.35);
+}
+.btn-emu-p:hover { box-shadow: 0 8px 30px rgba(245,158,11,0.55); }
 
-  .success-box {
-    display: none;
-    background: rgba(34,197,94,0.08);
-    border: 1px solid rgba(34,197,94,0.25);
-    border-radius: var(--radius-md);
-    padding: 14px 16px; margin-top: 14px;
-    color: #86efac; font-size: 13px;
-    text-align: center;
-  }
-  .success-box .created-key {
-    font-family: monospace; font-size: 15px; font-weight: 800;
-    color: #4ade80; display: block; margin: 8px 0;
-    user-select: all; cursor: text;
-    word-break: break-all;
-  }
-  .success-box .copy-note { font-size: 11px; color: var(--txt-2); }
+.btn-opti-p {
+  background: linear-gradient(135deg, var(--cyan), var(--cyan-dk));
+  color: #000;
+  box-shadow: 0 4px 20px rgba(56,189,248,0.3);
+}
+.btn-opti-p:hover { box-shadow: 0 8px 30px rgba(56,189,248,0.5); }
 
-  .modal-footer {
-    display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;
-  }
-  .btn-sm {
-    padding: 9px 20px; border-radius: var(--radius-sm);
-    font-weight: 700; font-size: 12.5px; border: none; cursor: pointer; transition: all 0.2s;
-  }
-  .btn-sm.ghost { background: var(--surface-3); color: var(--txt-1); }
-  .btn-sm.ghost:hover { background: rgba(255,255,255,0.07); }
-  .btn-sm.primary {
-    background: linear-gradient(135deg, var(--gold), var(--gold-dim));
-    color: #000; box-shadow: 0 0 14px rgba(245,158,11,0.35);
-  }
-  .btn-sm.primary:hover { box-shadow: 0 0 22px rgba(245,158,11,0.55); }
+.btn-outline {
+  background: rgba(255,255,255,0.04);
+  color: var(--t1); border: 1px solid var(--border-hi);
+  padding: 13px 18px; border-radius: var(--r-md);
+  font-weight: 700; font-size: 13px; cursor: pointer;
+  transition: all 0.2s; white-space: nowrap;
+}
+.btn-outline:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.22); }
 
-  /* ────────────────────────────────────────────────
-     LIVE PULSE
-  ──────────────────────────────────────────────── */
-  .pulse-dot {
-    display: inline-block; width: 8px; height: 8px;
-    border-radius: 50%; background: var(--green);
-    box-shadow: 0 0 6px var(--green);
-    animation: pulse 1.8s infinite;
-    margin-right: 6px; vertical-align: middle;
-  }
-  @keyframes pulse {
-    0%,100% { opacity: 1; transform: scale(1); }
-    50%      { opacity: 0.5; transform: scale(0.8); }
-  }
+/* ═══════════════════════════════════════════
+   TABLE SECTION
+═══════════════════════════════════════════ */
+#table-section { display: none; }
 
-  /* ── Scrollbar ── */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 99px; }
-  ::-webkit-scrollbar-thumb:hover { background: #334155; }
+.tbl-header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 14px; margin-bottom: 18px;
+}
+.tbl-header-left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+#table-title { font-size: 17px; font-weight: 800; }
 
-  /* ── Responsive ── */
-  @media (max-width: 720px) {
-    .topbar { flex-wrap: wrap; top: 0; border-radius: var(--radius-lg); }
-    .nav-pills { display: none; }
-    .hub-header h2 { font-size: 22px; }
-    .suite-grid { grid-template-columns: 1fr; }
-    .search-input { width: 100%; }
-  }
+.pills {
+  display: flex; gap: 3px;
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 4px;
+}
+.pill {
+  background: transparent; border: none;
+  color: var(--t2); font-size: 11.5px; font-weight: 600;
+  padding: 6px 13px; border-radius: 6px; cursor: pointer;
+  transition: all 0.18s; white-space: nowrap;
+}
+.pill:hover { color: var(--t1); background: rgba(255,255,255,0.05); }
+.pill.active { background: var(--s3); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+
+.search-box {
+  position: relative;
+}
+.search-box input {
+  background: var(--s1); border: 1px solid var(--border);
+  color: var(--t1); padding: 9px 14px 9px 36px;
+  border-radius: var(--r-sm); font-size: 12.5px; outline: none;
+  width: 270px; transition: border-color 0.2s;
+  font-family: inherit;
+}
+.search-box input:focus { border-color: rgba(56,189,248,0.45); }
+.search-box input::placeholder { color: var(--t3); }
+.search-box .s-ico {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  color: var(--t3); font-size: 15px; pointer-events: none;
+}
+
+/* Table */
+.tbl-wrap {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+}
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+  padding: 14px 18px;
+  background: rgba(0,0,0,0.45);
+  color: var(--t3); font-size: 10px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.9px;
+  text-align: left; border-bottom: 1px solid var(--border);
+}
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.14s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,0.024); }
+tbody td { padding: 13px 18px; }
+
+/* Badges */
+.bdg {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 999px;
+  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.bdg-online  { background: rgba(34,197,94,0.12);  color: #4ade80; border: 1px solid rgba(34,197,94,0.28); }
+.bdg-offline { background: var(--s3); color: var(--t3); }
+.bdg-active  { background: rgba(56,189,248,0.1);  color: var(--cyan-lt); border: 1px solid rgba(56,189,248,0.22); }
+.bdg-banned  { background: rgba(239,68,68,0.1);   color: #f87171;        border: 1px solid rgba(239,68,68,0.22); }
+.bdg-emu     { background: rgba(245,158,11,0.12); color: var(--gold-lt); border: 1px solid rgba(245,158,11,0.28); }
+.bdg-opti    { background: rgba(56,189,248,0.1);  color: var(--cyan-lt); border: 1px solid rgba(56,189,248,0.22); }
+.bdg-vip     { background: linear-gradient(135deg,rgba(245,158,11,0.18),rgba(168,85,247,0.18)); color:#e2b3ff; border: 1px solid rgba(168,85,247,0.3); }
+
+/* Action buttons */
+.act {
+  padding: 5px 10px; border-radius: 6px; border: none;
+  font-size: 10.5px; font-weight: 700; cursor: pointer;
+  transition: opacity 0.15s, transform 0.12s; margin-right: 4px;
+}
+.act:hover { opacity: 0.75; transform: scale(0.96); }
+.a-kick  { background: rgba(234,179,8,0.18);  color: #fde047; border: 1px solid rgba(234,179,8,0.3); }
+.a-ban   { background: rgba(239,68,68,0.14);  color: #f87171; border: 1px solid rgba(239,68,68,0.28); }
+.a-unban { background: rgba(34,197,94,0.12);  color: #4ade80; border: 1px solid rgba(34,197,94,0.28); }
+.a-hwid  { background: rgba(255,255,255,0.06); color: var(--t1); }
+.a-del   { background: rgba(239,68,68,0.08);  color: #f87171; border: 1px solid rgba(239,68,68,0.16); }
+
+.key-text {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+}
+.hwid-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; color: var(--t3);
+}
+.empty-notice td {
+  text-align: center; padding: 50px; color: var(--t2); font-size: 14px;
+}
+
+/* ═══════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════ */
+.overlay {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(16px) saturate(150%);
+  align-items: center; justify-content: center;
+}
+.overlay.show { display: flex; }
+
+.modal {
+  background: var(--s1);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-2xl);
+  width: 92%; max-width: 520px;
+  padding: 32px;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04) inset;
+  animation: modalIn 0.28s cubic-bezier(0.16,1,0.3,1);
+  position: relative; overflow: hidden;
+}
+.modal::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-lt), var(--cyan));
+}
+@keyframes modalIn {
+  from { transform: translateY(24px) scale(0.97); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+.modal-top {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 26px;
+}
+.modal-icon {
+  width: 48px; height: 48px; flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(56,189,248,0.08));
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+}
+.modal-title { font-size: 19px; font-weight: 900; letter-spacing: -0.3px; }
+.modal-sub   { font-size: 12px; color: var(--t2); margin-top: 3px; }
+
+.field { margin-bottom: 18px; }
+.field label {
+  display: block; font-size: 10.5px; font-weight: 800;
+  color: var(--t2); text-transform: uppercase; letter-spacing: 0.9px;
+  margin-bottom: 8px;
+}
+.field select,
+.field input {
+  width: 100%; background: rgba(0,0,0,0.35);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--r-sm); padding: 11px 14px;
+  color: var(--t1); font-size: 13.5px; outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field select:focus,
+.field input:focus {
+  border-color: rgba(245,158,11,0.6);
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
+}
+.field select option { background: var(--s2); }
+
+.success-block {
+  display: none;
+  background: rgba(34,197,94,0.07);
+  border: 1px solid rgba(34,197,94,0.25);
+  border-radius: var(--r-md); padding: 16px;
+  margin-top: 16px; text-align: center;
+}
+.success-block .s-icon { font-size: 22px; margin-bottom: 8px; }
+.success-block .s-label { font-size: 12px; color: var(--t2); margin-bottom: 8px; }
+.success-block .s-key {
+  display: block; font-family: 'JetBrains Mono', monospace;
+  font-size: 15px; font-weight: 800; color: #4ade80;
+  letter-spacing: 0.5px; cursor: text; user-select: all;
+  word-break: break-all; padding: 8px;
+  background: rgba(34,197,94,0.08); border-radius: var(--r-sm);
+}
+.success-block .s-copy { font-size: 11px; color: var(--t3); margin-top: 8px; }
+
+.modal-btns {
+  display: flex; justify-content: flex-end; gap: 10px; margin-top: 26px;
+}
+.btn-close {
+  background: rgba(255,255,255,0.05); color: var(--t1);
+  border: 1px solid var(--border-hi); padding: 10px 20px;
+  border-radius: var(--r-sm); font-weight: 700; font-size: 13px;
+  cursor: pointer; transition: background 0.2s; font-family: inherit;
+}
+.btn-close:hover { background: rgba(255,255,255,0.09); }
+.btn-gen {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dk));
+  color: #000; font-weight: 900; font-size: 13px;
+  border: none; padding: 10px 24px; border-radius: var(--r-sm);
+  cursor: pointer; box-shadow: 0 4px 18px var(--gold-gl);
+  transition: all 0.2s; font-family: inherit;
+}
+.btn-gen:hover { transform: translateY(-2px); box-shadow: 0 8px 26px var(--gold-gl); }
+
+/* ═══════════════════════════════════════════
+   PULSE INDICATOR
+═══════════════════════════════════════════ */
+.pulse {
+  display: inline-block; width: 7px; height: 7px;
+  border-radius: 50%; vertical-align: middle;
+  animation: pulse-anim 1.8s ease-in-out infinite;
+}
+.p-grn { background: var(--grn); box-shadow: 0 0 8px var(--grn); }
+.p-gold { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+.p-cyan { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+@keyframes pulse-anim {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.4; transform:scale(0.75); }
+}
+
+/* ═══════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════ */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--s3); border-radius: 99px; }
 </style>
 </head>
 <body>
 
-<canvas id="bg-canvas"></canvas>
+<!-- ── Background ── -->
+<div class="bg-layer">
+  <div class="aurora">
+    <div class="aurora-orb ao1"></div>
+    <div class="aurora-orb ao2"></div>
+    <div class="aurora-orb ao3"></div>
+    <div class="aurora-orb ao4"></div>
+  </div>
+  <div class="grid-dots"></div>
+  <div class="scanline"></div>
+</div>
 
-<div class="wrapper">
+<div class="page">
 
-  <!-- ── TOP NAV ── -->
-  <nav class="topbar">
+  <!-- ════════════ NAVBAR ════════════ -->
+  <nav class="navbar">
     <div class="brand">
-      <div class="brand-logo-wrap">🎮</div>
-      <div class="brand-text">
+      <div class="brand-gem">🎮</div>
+      <div class="brand-words">
         <div class="brand-name">KNOXYY CENTRAL</div>
-        <div class="brand-tag">Unified Licensing Cloud Portal</div>
+        <div class="brand-tagline">Elite Gaming Suite · Cloud Portal</div>
       </div>
     </div>
 
-    <div class="nav-pills">
-      <button class="nav-pill active" id="tab-portal" onclick="switchView('portal')">🌟 Suite Hub</button>
-      <button class="nav-pill" id="tab-emu"    onclick="switchView('emu')">🎮 Emulator</button>
-      <button class="nav-pill" id="tab-opti"   onclick="switchView('opti')">⚡ Optimizer</button>
-      <button class="nav-pill" id="tab-all"    onclick="switchView('all')">📊 All Licenses</button>
+    <div class="nav-center">
+      <button class="nav-tab active" id="tab-portal" onclick="switchView('portal')">🌟 Suite Hub</button>
+      <button class="nav-tab" id="tab-emu"    onclick="switchView('emu')">🎮 Emulator</button>
+      <button class="nav-tab" id="tab-opti"   onclick="switchView('opti')">⚡ Optimizer</button>
+      <button class="nav-tab" id="tab-all"    onclick="switchView('all')">📊 All Licenses</button>
     </div>
 
-    <button class="btn-create-key" onclick="openModal()">✦ Create License</button>
+    <button class="btn-new-key" onclick="openModal()">✦ &nbsp;Create License</button>
   </nav>
 
-  <!-- ── STATS BAR ── -->
-  <div class="stats-bar">
-    <div class="stat-card gold">
-      <div class="stat-label">Emulator — Online</div>
-      <div class="stat-value gold" id="s-emu-online">0</div>
-      <div class="stat-sub"><span class="pulse-dot"></span>Live heartbeats</div>
+  <!-- ════════════ HERO ════════════ -->
+  <div class="hero" id="hero-block">
+    <div class="hero-eyebrow">
+      <span class="dot"></span>
+      Live Cloud Licensing Dashboard
     </div>
-    <div class="stat-card gold">
-      <div class="stat-label">Emulator — Total Keys</div>
-      <div class="stat-value gold" id="s-emu-total">0</div>
-      <div class="stat-sub">Registered in DB</div>
+    <h1 class="hero-title">
+      <span class="line1">One Portal.</span>
+      <span class="line2">Two Elite Suites.</span>
+    </h1>
+    <p class="hero-sub">
+      Manage hardware-locked licenses, monitor live sessions, kick & ban users — all from a single real-time cloud control center.
+    </p>
+  </div>
+
+  <!-- ════════════ STATS ROW ════════════ -->
+  <div class="stats-row">
+    <div class="stat-tile st-gold">
+      <div class="bg-icon">🎮</div>
+      <div class="stat-label">Emulator Online</div>
+      <div class="stat-num c-gold" id="s-emu-on">0</div>
+      <div class="stat-hint"><span class="pulse p-gold"></span> Live now</div>
     </div>
-    <div class="stat-card cyan">
-      <div class="stat-label">Optimizer — Online</div>
-      <div class="stat-value cyan" id="s-opti-online">0</div>
-      <div class="stat-sub"><span class="pulse-dot" style="background:#38bdf8;box-shadow:0 0 6px #38bdf8;"></span>Live</div>
+    <div class="stat-tile st-gold">
+      <div class="bg-icon">🔑</div>
+      <div class="stat-label">Emulator Keys</div>
+      <div class="stat-num c-gold" id="s-emu-tot">0</div>
+      <div class="stat-hint">Registered in DB</div>
     </div>
-    <div class="stat-card cyan">
-      <div class="stat-label">Optimizer — Total Keys</div>
-      <div class="stat-value cyan" id="s-opti-total">0</div>
-      <div class="stat-sub">Registered in DB</div>
+    <div class="stat-tile st-cyan">
+      <div class="bg-icon">⚡</div>
+      <div class="stat-label">Optimizer Online</div>
+      <div class="stat-num c-cyan" id="s-opti-on">0</div>
+      <div class="stat-hint"><span class="pulse p-cyan"></span> Live now</div>
     </div>
-    <div class="stat-card green">
-      <div class="stat-label">Total Online Now</div>
-      <div class="stat-value green" id="s-total-online">0</div>
-      <div class="stat-sub">Across all products</div>
+    <div class="stat-tile st-cyan">
+      <div class="bg-icon">🔑</div>
+      <div class="stat-label">Optimizer Keys</div>
+      <div class="stat-num c-cyan" id="s-opti-tot">0</div>
+      <div class="stat-hint">Registered in DB</div>
     </div>
-    <div class="stat-card red">
-      <div class="stat-label">Banned / Revoked</div>
-      <div class="stat-value red" id="s-banned">0</div>
-      <div class="stat-sub">Blocked keys</div>
+    <div class="stat-tile st-grn">
+      <div class="bg-icon">🌐</div>
+      <div class="stat-label">Total Online</div>
+      <div class="stat-num c-grn" id="s-all-on">0</div>
+      <div class="stat-hint"><span class="pulse p-grn"></span> All products</div>
+    </div>
+    <div class="stat-tile st-red">
+      <div class="bg-icon">🚫</div>
+      <div class="stat-label">Banned</div>
+      <div class="stat-num c-red" id="s-banned">0</div>
+      <div class="stat-hint">Revoked keys</div>
     </div>
   </div>
 
-  <!-- ── SUITE HUB ── -->
-  <div id="suite-selection">
-    <div class="hub-header">
-      <span class="eyebrow">Cloud License Manager</span>
-      <h2>Select Your Gaming Software Suite</h2>
-      <p>Manage live instances, generate hardware-locked keys, kick / ban users — all from one central dashboard.</p>
-    </div>
-
-    <div class="suite-grid">
+  <!-- ════════════ SUITE HUB ════════════ -->
+  <div class="hub-section" id="suite-section">
+    <div class="cards-grid">
 
       <!-- EMULATOR CARD -->
-      <div class="suite-card emu">
-        <div class="top-strip"></div>
-        <div class="watermark">🎮</div>
-        <div class="card-top">
-          <div class="card-icon-wrap">🎮</div>
-          <div class="card-meta">
-            <h3>KNOXYY EMULATOR</h3>
-            <span class="card-badge badge-emu">v69.67 Gold Elite Edition</span>
+      <div class="product-card card-emu">
+        <div class="card-orb"></div>
+        <div class="card-stripe"></div>
+        <div class="card-body">
+          <div class="card-head">
+            <div class="card-icon-box">🎮</div>
+            <div class="card-titles">
+              <h3>KNOXYY EMULATOR</h3>
+              <span class="card-pill pill-emu">v69.67 Gold Elite Edition</span>
+            </div>
           </div>
-        </div>
-        <p class="card-desc">
-          Custom debloated Android VM built for Free Fire &amp; competitive mobile gaming with HWID hardware-bound licensing and cloud heartbeat guard.
-        </p>
-        <ul class="features">
-          <li><span class="tick">✓</span> P64 Lite Debloated Engine — 40% less RAM</li>
-          <li><span class="tick">✓</span> 450+ FPS Unlocked · ASUS ROG Phone 2 Profile</li>
-          <li><span class="tick">✓</span> DirectX / OpenGL Anti-Lag · Zero Input Delay</li>
-          <li><span class="tick">✓</span> HWID Security Guard · Real-time Heartbeat</li>
-        </ul>
-        <div class="mini-stats">
-          <div class="ms-item">
-            <div class="ms-label">Online Active</div>
-            <div class="ms-val" id="c-emu-online" style="color:var(--green)">0</div>
+
+          <p class="card-desc">
+            Custom debloated Android VM engineered for Free Fire & competitive mobile gaming. Hardware-bound license with real-time cloud heartbeat guard.
+          </p>
+
+          <ul class="feat-list">
+            <li><span class="feat-check">✓</span> P64 Lite Debloated Engine — 40% RAM reduction</li>
+            <li><span class="feat-check">✓</span> 450+ FPS Unlocked · ASUS ROG Phone 2 Profile</li>
+            <li><span class="feat-check">✓</span> DirectX / OpenGL Anti-Lag · Zero Input Delay</li>
+            <li><span class="feat-check">✓</span> HWID Hardware Guard · Live Heartbeat Daemon</li>
+          </ul>
+
+          <div class="mini-stat-row">
+            <div class="mini-stat">
+              <div class="ms-label">Online Active</div>
+              <div class="ms-val" id="c-emu-on" style="color:var(--grn)">0</div>
+            </div>
+            <div class="mini-stat">
+              <div class="ms-label">Total Keys</div>
+              <div class="ms-val" id="c-emu-tot" style="color:var(--gold)">0</div>
+            </div>
           </div>
-          <div class="ms-item">
-            <div class="ms-label">Total Keys</div>
-            <div class="ms-val" id="c-emu-total" style="color:var(--gold)">0</div>
+
+          <div class="card-actions">
+            <button class="btn-card-primary btn-emu-p" onclick="switchView('emu')">
+              Manage Emulator Keys &rarr;
+            </button>
+            <button class="btn-outline" onclick="openModal('emulator')">+ Key</button>
           </div>
-        </div>
-        <div class="card-btns">
-          <button class="btn-main gold-btn" onclick="switchView('emu')">Manage Emulator →</button>
-          <button class="btn-ghost" onclick="openModal('emulator')">+ Key</button>
         </div>
       </div>
 
       <!-- OPTIMIZER CARD -->
-      <div class="suite-card opti">
-        <div class="top-strip"></div>
-        <div class="watermark">⚡</div>
-        <div class="card-top">
-          <div class="card-icon-wrap">⚡</div>
-          <div class="card-meta">
-            <h3>KNOXYY PRO OPTIMIZER</h3>
-            <span class="card-badge badge-opti">Aim &amp; System Booster</span>
+      <div class="product-card card-opti">
+        <div class="card-orb"></div>
+        <div class="card-stripe"></div>
+        <div class="card-body">
+          <div class="card-head">
+            <div class="card-icon-box">⚡</div>
+            <div class="card-titles">
+              <h3>KNOXYY PRO OPTIMIZER</h3>
+              <span class="card-pill pill-opti">Aim &amp; System Booster</span>
+            </div>
           </div>
-        </div>
-        <p class="card-desc">
-          High-FPS Windows tuning suite: registry kernel tweaks, GPU max priority, 0ms aim mouse queue, and hardware-locked license protection.
-        </p>
-        <ul class="features">
-          <li><span class="tick">✓</span> 0ms Mouse Queue · Headshot Aim Precision</li>
-          <li><span class="tick">✓</span> GPU Dedicated Priority · Thread Responsiveness</li>
-          <li><span class="tick">✓</span> Zero-Background Bloat Memory Flush</li>
-          <li><span class="tick">✓</span> HWID Lock Protection Against Key Sharing</li>
-        </ul>
-        <div class="mini-stats">
-          <div class="ms-item">
-            <div class="ms-label">Online Active</div>
-            <div class="ms-val" id="c-opti-online" style="color:var(--green)">0</div>
+
+          <p class="card-desc">
+            High-FPS Windows tuning suite: registry kernel tweaks, GPU max priority scheduling, 0ms aim mouse queue, hardware-locked piracy protection.
+          </p>
+
+          <ul class="feat-list">
+            <li><span class="feat-check">✓</span> 0ms Mouse Queue · Headshot Aim Precision Mode</li>
+            <li><span class="feat-check">✓</span> GPU Dedicated Priority · Thread Responsiveness</li>
+            <li><span class="feat-check">✓</span> Zero-Background Bloat Memory Flush</li>
+            <li><span class="feat-check">✓</span> HWID Lock — Anti Key-Sharing Protection</li>
+          </ul>
+
+          <div class="mini-stat-row">
+            <div class="mini-stat">
+              <div class="ms-label">Online Active</div>
+              <div class="ms-val" id="c-opti-on" style="color:var(--grn)">0</div>
+            </div>
+            <div class="mini-stat">
+              <div class="ms-label">Total Keys</div>
+              <div class="ms-val" id="c-opti-tot" style="color:var(--cyan)">0</div>
+            </div>
           </div>
-          <div class="ms-item">
-            <div class="ms-label">Total Keys</div>
-            <div class="ms-val" id="c-opti-total" style="color:var(--cyan)">0</div>
+
+          <div class="card-actions">
+            <button class="btn-card-primary btn-opti-p" onclick="switchView('opti')">
+              Manage Optimizer Keys &rarr;
+            </button>
+            <button class="btn-outline" onclick="openModal('optimizer')">+ Key</button>
           </div>
-        </div>
-        <div class="card-btns">
-          <button class="btn-main cyan-btn" onclick="switchView('opti')">Manage Optimizer →</button>
-          <button class="btn-ghost" onclick="openModal('optimizer')">+ Key</button>
         </div>
       </div>
 
     </div>
-  </div><!-- /suite-selection -->
+  </div>
 
-  <!-- ── TABLE SECTION ── -->
-  <div id="table-section" style="display:none;">
-    <div class="section-header">
-      <div class="section-header-left">
+  <!-- ════════════ TABLE SECTION ════════════ -->
+  <div id="table-section">
+    <div class="tbl-header">
+      <div class="tbl-header-left">
         <h3 id="table-title">All Licenses</h3>
-        <div class="pill-group">
-          <button class="pill-btn active" id="pill-all"  onclick="setFilter('all')">All</button>
-          <button class="pill-btn" id="pill-emu"          onclick="setFilter('emulator')">🎮 Emulator</button>
-          <button class="pill-btn" id="pill-opti"         onclick="setFilter('optimizer')">⚡ Optimizer</button>
-          <button class="pill-btn" id="pill-vip"          onclick="setFilter('vip')">🌟 VIP Pass</button>
+        <div class="pills">
+          <button class="pill active" id="p-all"  onclick="setFilter('all')">All</button>
+          <button class="pill" id="p-emu"          onclick="setFilter('emulator')">🎮 Emulator</button>
+          <button class="pill" id="p-opti"         onclick="setFilter('optimizer')">⚡ Optimizer</button>
+          <button class="pill" id="p-vip"          onclick="setFilter('vip')">🌟 VIP</button>
         </div>
       </div>
-      <div class="search-wrap">
-        <span class="ico">🔍</span>
-        <input class="search-input" id="search-q" type="text"
+      <div class="search-box">
+        <span class="s-ico">🔍</span>
+        <input id="search-q" type="text"
                placeholder="Search key, user, HWID…" oninput="renderTable()">
       </div>
     </div>
 
-    <div class="table-wrap">
+    <div class="tbl-wrap">
       <table>
         <thead>
           <tr>
@@ -761,32 +971,32 @@
     </div>
   </div>
 
-</div><!-- /wrapper -->
+</div><!-- /page -->
 
-<!-- ── CREATE LICENSE MODAL ── -->
-<div class="modal-backdrop" id="create-modal">
+<!-- ════════════ MODAL ════════════ -->
+<div class="overlay" id="modal-overlay">
   <div class="modal">
-    <div class="modal-header">
+    <div class="modal-top">
       <div class="modal-icon">✦</div>
       <div>
         <div class="modal-title">Generate License Key</div>
-        <div class="modal-sub">New hardware-locked key for any product</div>
+        <div class="modal-sub">Hardware-locked key for any product</div>
       </div>
     </div>
 
-    <div class="form-field">
+    <div class="field">
       <label>Software Suite</label>
-      <select id="m-product">
+      <select id="m-prod">
         <option value="emulator">🎮  Knoxyy Emulator  (v69.67 Gold Elite)</option>
         <option value="optimizer">⚡  Knoxyy Pro Aim Optimizer</option>
         <option value="all">🌟  All-in-One VIP Pass  (Both Suites)</option>
       </select>
     </div>
-    <div class="form-field">
+    <div class="field">
       <label>Target Username</label>
-      <input type="text" id="m-username" placeholder="e.g. KnoxyyGamer">
+      <input type="text" id="m-user" placeholder="e.g. KnoxyyGamer">
     </div>
-    <div class="form-field">
+    <div class="field">
       <label>License Duration</label>
       <select id="m-days">
         <option value="-1">♾️  Lifetime  (Permanent)</option>
@@ -797,260 +1007,210 @@
       </select>
     </div>
 
-    <div class="success-box" id="m-success">
-      ✅ License key created &amp; copied to clipboard!
-      <span class="created-key" id="m-key-display"></span>
-      <span class="copy-note">Click the key above to select it</span>
+    <div class="success-block" id="m-success">
+      <div class="s-icon">🎉</div>
+      <div class="s-label">License created &amp; copied to clipboard!</div>
+      <span class="s-key" id="m-key"></span>
+      <div class="s-copy">Click the key above to select &amp; copy</div>
     </div>
 
-    <div class="modal-footer">
-      <button class="btn-sm ghost" onclick="closeModal()">Close</button>
-      <button class="btn-sm primary" onclick="submitCreate()">⚡ Generate Key</button>
+    <div class="modal-btns">
+      <button class="btn-close" onclick="closeModal()">Close</button>
+      <button class="btn-gen"   onclick="submitCreate()">⚡ &nbsp;Generate Key</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ───────── State ───────── */
-let licenses = [];
-let activeFilter = 'all';
+/* ───── State ───── */
+let licenses   = [];
+let curFilter  = 'all';
 
-/* ───────── Animated background dots ───────── */
-(function() {
-  const canvas = document.getElementById('bg-canvas');
-  const ctx = canvas.getContext('2d');
-  let W, H, dots;
-
-  function resize() {
-    W = canvas.width  = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-    initDots();
-  }
-
-  function initDots() {
-    dots = Array.from({length: 60}, () => ({
-      x: Math.random() * W, y: Math.random() * H,
-      r: Math.random() * 1.5 + 0.4,
-      dx: (Math.random() - 0.5) * 0.3,
-      dy: (Math.random() - 0.5) * 0.3,
-      col: Math.random() > 0.5 ? '#f59e0b' : '#38bdf8'
-    }));
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-    dots.forEach(d => {
-      ctx.beginPath();
-      ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-      ctx.fillStyle = d.col;
-      ctx.globalAlpha = 0.45;
-      ctx.fill();
-      d.x += d.dx; d.y += d.dy;
-      if (d.x < 0 || d.x > W) d.dx *= -1;
-      if (d.y < 0 || d.y > H) d.dy *= -1;
-    });
-    // connect nearby dots
-    for (let i = 0; i < dots.length; i++) {
-      for (let j = i+1; j < dots.length; j++) {
-        const dx = dots[i].x - dots[j].x, dy = dots[i].y - dots[j].y;
-        const dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < 120) {
-          ctx.beginPath();
-          ctx.moveTo(dots[i].x, dots[i].y);
-          ctx.lineTo(dots[j].x, dots[j].y);
-          ctx.strokeStyle = dots[i].col;
-          ctx.globalAlpha = 0.04 * (1 - dist/120);
-          ctx.lineWidth = 0.6;
-          ctx.stroke();
-        }
-      }
-    }
-    ctx.globalAlpha = 1;
-    requestAnimationFrame(draw);
-  }
-
-  window.addEventListener('resize', resize);
-  resize();
-  draw();
-})();
-
-/* ───────── Data loading ───────── */
-async function loadData() {
+/* ───── Fetch data ───── */
+async function load() {
   try {
-    const res  = await fetch('/api/v1/admin/list');
-    const data = await res.json();
-    licenses = data.licenses || [];
-    updateStats();
+    const r = await fetch('/api/v1/admin/list');
+    const d = await r.json();
+    licenses = d.licenses || [];
+    calcStats();
     renderTable();
-  } catch(e) { console.warn('fetch fail', e); }
+  } catch(e) { console.warn('load fail', e); }
 }
 
-function isOnline(l) {
+function online(l) {
   if (!l.last_seen) return false;
-  return (Date.now() - new Date(l.last_seen).getTime()) / 1000 < 75;
+  return (Date.now() - new Date(l.last_seen).getTime()) < 75_000;
 }
 
-function updateStats() {
-  let emuOn=0, emuT=0, optiOn=0, optiT=0, banned=0, totalOn=0;
+/* ───── Stats ───── */
+function calcStats() {
+  let eOn=0, eTot=0, oOn=0, oTot=0, allOn=new Set(), banned=0;
   licenses.forEach(l => {
     const p = (l.product||'emulator').toLowerCase();
-    const on = isOnline(l);
-    if (l.is_active === 0) banned++;
-    if (p==='emulator'||p==='all') { emuT++; if(on) emuOn++; }
-    if (p==='optimizer'||p==='all') { optiT++; if(on) optiOn++; }
-    if (on) totalOn++;
+    const on = online(l);
+    if (!l.is_active) banned++;
+    if (p==='emulator'||p==='all') { eTot++; if(on) eOn++; }
+    if (p==='optimizer'||p==='all') { oTot++; if(on) oOn++; }
+    if (on) allOn.add(l.key);
   });
-  const dedup = new Set();
-  licenses.forEach(l => { if(isOnline(l)) dedup.add(l.key); });
-  totalOn = dedup.size;
+  set('s-emu-on', eOn);  set('s-emu-tot', eTot);
+  set('s-opti-on', oOn); set('s-opti-tot', oTot);
+  set('s-all-on', allOn.size); set('s-banned', banned);
+  set('c-emu-on', eOn);  set('c-emu-tot', eTot);
+  set('c-opti-on', oOn); set('c-opti-tot', oTot);
+  // Animate numbers
+  animateNums();
+}
+function set(id,v){ const el=document.getElementById(id); if(el) el.textContent=v; }
 
-  const s = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
-  s('s-emu-online',emuOn); s('s-emu-total',emuT);
-  s('s-opti-online',optiOn); s('s-opti-total',optiT);
-  s('s-total-online',totalOn); s('s-banned',banned);
-  s('c-emu-online',emuOn); s('c-emu-total',emuT);
-  s('c-opti-online',optiOn); s('c-opti-total',optiT);
+let animFrame;
+function animateNums() {
+  document.querySelectorAll('.stat-num').forEach(el => {
+    const target = parseInt(el.textContent)||0;
+    let cur = 0;
+    const step = Math.max(1, Math.ceil(target/20));
+    const tick = () => {
+      cur = Math.min(cur+step, target);
+      el.textContent = cur;
+      if (cur < target) requestAnimationFrame(tick);
+    };
+    el.textContent = 0;
+    requestAnimationFrame(tick);
+  });
 }
 
-/* ───────── Table rendering ───────── */
+/* ───── Table ───── */
 function renderTable() {
   const tbody = document.getElementById('tbl-body');
   if (!tbody) return;
-  tbody.innerHTML = '';
   const q = (document.getElementById('search-q')?.value||'').toLowerCase();
 
   const rows = licenses.filter(l => {
     const p = (l.product||'emulator').toLowerCase();
-    if (activeFilter==='emulator' && p!=='emulator') return false;
-    if (activeFilter==='optimizer' && p!=='optimizer') return false;
-    if (activeFilter==='vip' && p!=='all') return false;
-    if (q) {
-      const match = [l.key,l.username,l.hwid].some(v => (v||'').toLowerCase().includes(q));
-      if (!match) return false;
-    }
+    if (curFilter==='emulator' && p!=='emulator') return false;
+    if (curFilter==='optimizer' && p!=='optimizer') return false;
+    if (curFilter==='vip' && p!=='all') return false;
+    if (q && ![l.key,l.username,l.hwid].some(v=>(v||'').toLowerCase().includes(q))) return false;
     return true;
   });
 
   if (!rows.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No licenses found.</td></tr>';
+    tbody.innerHTML='<tr class="empty-notice"><td colspan="8">🔍 No licenses found.</td></tr>';
     return;
   }
+  tbody.innerHTML='';
 
   rows.forEach(l => {
-    const on = isOnline(l);
+    const on = online(l);
     const p  = (l.product||'emulator').toLowerCase();
-    let prodBadge, keyCol;
-    if (p==='optimizer') {
-      prodBadge = '<span class="badge b-opti">⚡ Optimizer</span>'; keyCol='#7dd3fc';
-    } else if (p==='all') {
-      prodBadge = '<span class="badge b-vip">🌟 VIP Both</span>';   keyCol='#fbbf24';
-    } else {
-      prodBadge = '<span class="badge b-emu">🎮 Emulator</span>';    keyCol='#fbbf24';
-    }
+    let prod, kc;
+    if (p==='optimizer') { prod='<span class="bdg bdg-opti">⚡ Optimizer</span>'; kc='#7dd3fc'; }
+    else if (p==='all')  { prod='<span class="bdg bdg-vip">🌟 VIP Both</span>';   kc='#fbbf24'; }
+    else                 { prod='<span class="bdg bdg-emu">🎮 Emulator</span>';    kc='#fbbf24'; }
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><span class="key-mono" style="color:${keyCol}">${escHtml(l.key)}</span></td>
-      <td style="font-weight:600">${escHtml(l.username||'—')}</td>
-      <td>${prodBadge}</td>
-      <td><span class="badge ${on?'b-online':'b-offline'}">${on?'● ONLINE':'Offline'}</span></td>
-      <td><span class="badge ${l.is_active?'b-active':'b-banned'}">${l.is_active?'Active':'Banned'}</span></td>
-      <td><span class="hwid-mono">${l.hwid ? l.hwid.substring(0,16)+'…' : '(Unbound)'}</span></td>
-      <td style="font-size:12px;color:var(--txt-2)">${escHtml(l.expires_at||'—')}</td>
+      <td><span class="key-text" style="color:${kc}">${esc(l.key)}</span></td>
+      <td style="font-weight:700">${esc(l.username||'—')}</td>
+      <td>${prod}</td>
+      <td><span class="bdg ${on?'bdg-online':'bdg-offline'}">${on?'● ONLINE':'Offline'}</span></td>
+      <td><span class="bdg ${l.is_active?'bdg-active':'bdg-banned'}">${l.is_active?'Active':'Banned'}</span></td>
+      <td><span class="hwid-text">${l.hwid ? l.hwid.slice(0,16)+'…' : '(Unbound)'}</span></td>
+      <td style="font-size:11.5px;color:var(--t2)">${esc(l.expires_at||'—')}</td>
       <td>
-        ${on ? `<button class="act-btn a-kick" onclick="doAction('kick','${escAttr(l.key)}')">Kick</button>` : ''}
+        ${on?`<button class="act a-kick" onclick="action('kick','${ea(l.key)}')">Kick</button>`:''}
         ${l.is_active
-          ? `<button class="act-btn a-ban"   onclick="doAction('ban','${escAttr(l.key)}')">Ban</button>`
-          : `<button class="act-btn a-unban" onclick="doAction('unban','${escAttr(l.key)}')">Unban</button>`
-        }
-        <button class="act-btn a-reset" onclick="doAction('reset_hwid','${escAttr(l.key)}')">HWID</button>
-        <button class="act-btn a-del"   onclick="doAction('delete','${escAttr(l.key)}')">Del</button>
-      </td>
-    `;
+          ?`<button class="act a-ban"   onclick="action('ban','${ea(l.key)}')">Ban</button>`
+          :`<button class="act a-unban" onclick="action('unban','${ea(l.key)}')">Unban</button>`}
+        <button class="act a-hwid" onclick="action('reset_hwid','${ea(l.key)}')">HWID</button>
+        <button class="act a-del"  onclick="action('delete','${ea(l.key)}')">Del</button>
+      </td>`;
     tbody.appendChild(tr);
   });
 }
 
-/* ───────── View switching ───────── */
+/* ───── View switching ───── */
 function switchView(v) {
-  document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
-  const tabSuite = document.getElementById('suite-selection');
-  const tabTbl   = document.getElementById('table-section');
+  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+  const suite = document.getElementById('suite-section');
+  const tbl   = document.getElementById('table-section');
+  const hero  = document.getElementById('hero-block');
 
   if (v==='portal') {
-    tabSuite.style.display='block'; tabTbl.style.display='none';
+    suite.style.display='block'; tbl.style.display='none';
+    hero.style.display='block';
     document.getElementById('tab-portal').classList.add('active');
     setFilter('all');
   } else {
-    tabSuite.style.display='none'; tabTbl.style.display='block';
-    const map = {emu:'tab-emu', opti:'tab-opti', all:'tab-all'};
-    document.getElementById(map[v]||'tab-all')?.classList.add('active');
-    const titles = {emu:'Knoxyy Emulator Licenses', opti:'Knoxyy Pro Optimizer Licenses', all:'All Licenses'};
-    document.getElementById('table-title').textContent = titles[v]||'All Licenses';
-    if (v==='emu')  setFilter('emulator',false);
-    else if(v==='opti') setFilter('optimizer',false);
-    else setFilter('all',false);
+    suite.style.display='none'; tbl.style.display='block';
+    hero.style.display='none';
+    const tid={emu:'tab-emu',opti:'tab-opti',all:'tab-all'};
+    document.getElementById(tid[v]||'tab-all').classList.add('active');
+    const ttl={emu:'🎮 Knoxyy Emulator Licenses',opti:'⚡ Pro Optimizer Licenses',all:'📊 All Licenses'};
+    document.getElementById('table-title').textContent=ttl[v]||'All Licenses';
+    const flt={emu:'emulator',opti:'optimizer',all:'all'};
+    setFilter(flt[v]||'all', false);
+    renderTable();
   }
 }
 
-function setFilter(f, re=true) {
-  activeFilter = f;
-  document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-  const map = {all:'pill-all', emulator:'pill-emu', optimizer:'pill-opti', vip:'pill-vip'};
-  document.getElementById(map[f]||'pill-all')?.classList.add('active');
-  if (re) renderTable();
+function setFilter(f, doRender=true) {
+  curFilter=f;
+  document.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+  const pm={all:'p-all',emulator:'p-emu',optimizer:'p-opti',vip:'p-vip'};
+  document.getElementById(pm[f]||'p-all')?.classList.add('active');
+  if (doRender) renderTable();
 }
 
-/* ───────── Modal ───────── */
-function openModal(preselect=null) {
+/* ───── Modal ───── */
+function openModal(pre=null) {
   document.getElementById('m-success').style.display='none';
-  if (preselect) document.getElementById('m-product').value=preselect;
-  document.getElementById('create-modal').classList.add('open');
+  if (pre) document.getElementById('m-prod').value=pre;
+  document.getElementById('modal-overlay').classList.add('show');
 }
 function closeModal() {
-  document.getElementById('create-modal').classList.remove('open');
-  loadData();
+  document.getElementById('modal-overlay').classList.remove('show');
+  load();
 }
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target===e.currentTarget) closeModal();
+});
 
 async function submitCreate() {
-  const prod  = document.getElementById('m-product').value;
-  const user  = document.getElementById('m-username').value.trim() || 'User';
-  const days  = parseInt(document.getElementById('m-days').value);
-  const res   = await fetch('/api/v1/admin/create_key', {
+  const prod = document.getElementById('m-prod').value;
+  const user = document.getElementById('m-user').value.trim()||'User';
+  const days = parseInt(document.getElementById('m-days').value);
+  const r = await fetch('/api/v1/admin/create_key', {
     method:'POST', headers:{'Content-Type':'application/json'},
     body: JSON.stringify({product:prod, username:user, days})
   });
-  const data = await res.json();
-  if (data.success) {
-    document.getElementById('m-key-display').textContent = data.key;
+  const d = await r.json();
+  if (d.success) {
+    document.getElementById('m-key').textContent=d.key;
     document.getElementById('m-success').style.display='block';
-    navigator.clipboard.writeText(data.key).catch(()=>{});
-    loadData();
+    navigator.clipboard.writeText(d.key).catch(()=>{});
+    load();
   }
 }
 
-/* ───────── Admin action ───────── */
-async function doAction(action, key) {
-  const safe = {'kick':'Kick','ban':'Ban','unban':'Unban','reset_hwid':'Reset HWID','delete':'DELETE'};
-  if (!confirm(`${safe[action]||action} license:\n${key}`)) return;
+/* ───── Admin action ───── */
+async function action(act, key) {
+  const labels={kick:'Kick',ban:'Ban',unban:'Unban',reset_hwid:'Reset HWID',delete:'⚠ DELETE'};
+  if (!confirm(`${labels[act]||act} this license?\n\n${key}`)) return;
   await fetch('/api/v1/admin/action', {
     method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({action, key})
+    body: JSON.stringify({action:act, key})
   });
-  loadData();
+  load();
 }
 
-/* ───────── Helpers ───────── */
-function escHtml(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-function escAttr(s) {
-  return String(s||'').replace(/'/g,"\\'");
-}
+/* ───── Helpers ───── */
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function ea(s){ return String(s||'').replace(/'/g,"\\'"); }
 
-/* ───────── Init ───────── */
-loadData();
-setInterval(loadData, 5000);
+/* ───── Init ───── */
+load();
+setInterval(load, 5000);
 </script>
 </body>
 </html>
