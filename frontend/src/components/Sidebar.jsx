@@ -2,10 +2,10 @@
 import { Compass, Cpu, Zap, CreditCard, RotateCw, Plus, SlidersHorizontal } from 'lucide-react';
 import { playSound } from '../utils/audio';
 
-export default function Sidebar({ currentView, setView, onOpenCreate, onRefresh, isRefreshing, accentColor = '#a855f7' }) {
+export default function Sidebar({ currentView, setView, onOpenCreate, onRefresh, isRefreshing, accentColor = '#ef4444' }) {
   const navItems = [
     { id: 'landing', label: 'Overview', icon: Compass },
-    { id: 'emulator', label: 'Knoxyy Emulator (Black Edition)', icon: Cpu },
+    { id: 'emulator', label: 'Knoxyy Emulator (Red & Black Edition)', icon: Cpu },
     { id: 'optimizer', label: 'Knoxyy Optimizer', icon: Zap },
     { id: 'pricing', label: 'Store & Pricing', icon: CreditCard },
     { id: 'settings', label: 'Settings & Theme', icon: SlidersHorizontal }
@@ -83,15 +83,15 @@ export default function Sidebar({ currentView, setView, onOpenCreate, onRefresh,
                 width: '46px',
                 height: '46px',
                 borderRadius: '12px',
-                background: isActive ? 'rgba(139, 92, 246, 0.16)' : 'transparent',
-                border: isActive ? '1px solid rgba(139, 92, 246, 0.45)' : '1px solid transparent',
+                background: isActive ? 'rgba(239, 68, 68, 0.16)' : 'transparent',
+                border: isActive ? '1px solid rgba(239, 68, 68, 0.45)' : '1px solid transparent',
                 color: isActive ? '#ffffff' : '#64748b',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.18s ease',
-                boxShadow: isActive ? '0 2px 14px rgba(139, 92, 246, 0.25)' : 'none',
+                boxShadow: isActive ? '0 2px 14px rgba(239, 68, 68, 0.25)' : 'none',
               }}
               onMouseOver={(e) => {
                 if (!isActive) {
@@ -106,7 +106,7 @@ export default function Sidebar({ currentView, setView, onOpenCreate, onRefresh,
                 }
               }}
             >
-              <Icon size={20} color={isActive ? '#a78bfa' : '#94a3b8'} />
+              <Icon size={20} color={isActive ? '#f87171' : '#94a3b8'} />
             </button>
           );
         })}

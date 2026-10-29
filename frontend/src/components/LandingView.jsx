@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { ArrowRight, ShieldCheck, Zap, Cpu, Terminal, Compass } from 'lucide-react';
 import AeroShards from './AeroShards';
 import TechText from './TechText';
@@ -13,7 +13,7 @@ export default function LandingView({
   const shardsEnabled = settings?.shardsEnabled !== false;
   const shardsOpacity = settings?.shardsOpacity ?? 0.32;
   const shardsSpeed = settings?.shardsSpeed ?? 1.0;
-  const accentColor = settings?.accentColor || '#a855f7';
+  const accentColor = settings?.accentColor || '#ef4444';
 
   return (
     <div className="animate-fade-in" style={{ width: '100%', maxWidth: '1240px', margin: '0 auto', paddingTop: '6px', position: 'relative' }}>
@@ -47,7 +47,7 @@ export default function LandingView({
           position: 'relative'
         }}>
           <TechText
-            text="KNOXXY 69"
+            text="KNOXYY"
             fontWeight={800}
             fontSize={84}
             reveal="letter"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from './components/Sidebar';
 import TopHeader from './components/TopHeader';
 import LandingView from './components/LandingView';
@@ -10,8 +10,8 @@ import LicenseModal from './components/LicenseModal';
 import DashboardSelectorModal from './components/DashboardSelectorModal';
 
 const DEFAULT_SETTINGS = {
-  accentColor: '#a855f7',
-  accentGlow: 'rgba(168, 85, 247, 0.4)',
+  accentColor: '#ef4444',
+  accentGlow: 'rgba(239, 68, 68, 0.45)',
   shardsEnabled: true,
   shardsOpacity: 0.32,
   shardsSpeed: 1.0,

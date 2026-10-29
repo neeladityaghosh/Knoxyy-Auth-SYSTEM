@@ -1,8 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import { Palette, Sparkles, Layout, RefreshCw, Sliders, Check, RotateCcw, Server } from 'lucide-react';
 
 const ACCENT_COLORS = [
-  { id: 'purple', name: 'Royal Purple', hex: '#a855f7', glow: 'rgba(168, 85, 247, 0.4)' },
+  { id: 'purple', name: 'Royal Purple', hex: '#ef4444', glow: 'rgba(239, 68, 68, 0.45)' },
   { id: 'amber', name: 'Knoxyy Orange', hex: '#ff781f', glow: 'rgba(255, 120, 31, 0.4)' },
   { id: 'cyan', name: 'Electric Cyan', hex: '#06b6d4', glow: 'rgba(6, 182, 212, 0.4)' },
   { id: 'emerald', name: 'Emerald Green', hex: '#10b981', glow: 'rgba(16, 185, 129, 0.4)' },
@@ -11,7 +11,7 @@ const ACCENT_COLORS = [
 ];
 
 export default function SettingsView({ settings, onUpdateSettings, onResetSettings, showToast }) {
-  const currentAccent = settings?.accentColor || '#a855f7';
+  const currentAccent = settings?.accentColor || '#ef4444';
   const shardsEnabled = settings?.shardsEnabled !== false;
   const shardsOpacity = settings?.shardsOpacity ?? 0.32;
   const shardsSpeed = settings?.shardsSpeed ?? 1;

@@ -2,13 +2,13 @@
 import { Plus, ArrowLeftRight, Volume2, VolumeX } from 'lucide-react';
 import { playSound, isAudioEnabled, toggleAudio } from '../utils/audio';
 
-export default function TopHeader({ currentView, onOpenCreate, onOpenSelector, accentColor = '#a855f7' }) {
+export default function TopHeader({ currentView, onOpenCreate, onOpenSelector, accentColor = '#ef4444' }) {
   const [soundOn, setSoundOn] = useState(() => isAudioEnabled());
 
   const titles = {
     landing: 'Knoxyy Overview',
     dashboard: 'Control Console',
-    emulator: 'Knoxyy Emulator Console (Black Edition)',
+    emulator: 'Knoxyy Emulator Console (Red & Black Edition)',
     optimizer: 'Knoxyy Optimizer Hub',
     pricing: 'Knoxyy Store & Packs',
     settings: 'Portal Settings'
@@ -82,9 +82,9 @@ export default function TopHeader({ currentView, onOpenCreate, onOpenSelector, a
             width: '38px',
             height: '38px',
             borderRadius: '50%',
-            background: soundOn ? 'rgba(139, 92, 246, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-            border: soundOn ? '1px solid rgba(139, 92, 246, 0.4)' : '1px solid var(--border-subtle)',
-            color: soundOn ? '#a78bfa' : '#64748b',
+            background: soundOn ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+            border: soundOn ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid var(--border-subtle)',
+            color: soundOn ? '#f87171' : '#64748b',
             cursor: 'pointer',
             transition: 'all 0.2s ease'
           }}

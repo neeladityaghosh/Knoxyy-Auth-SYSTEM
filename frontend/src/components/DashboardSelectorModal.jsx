@@ -1,7 +1,7 @@
-import React from 'react';
+﻿import React from 'react';
 import { Cpu, Zap, ArrowRight, X, Monitor, Gauge } from 'lucide-react';
 
-export default function DashboardSelectorModal({ isOpen, onClose, onSelectHub, accentColor = '#a855f7' }) {
+export default function DashboardSelectorModal({ isOpen, onClose, onSelectHub, accentColor = '#ef4444' }) {
   if (!isOpen) return null;
 
   return (

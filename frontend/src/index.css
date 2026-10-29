@@ -5,11 +5,11 @@
   --bg-surface-hover: rgba(28, 28, 42, 0.95);
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-medium: rgba(255, 255, 255, 0.14);
-  --border-glow-purple: rgba(139, 92, 246, 0.35);
+  --border-glow-purple: rgba(239, 68, 68, 0.4);
 
-  --purple-primary: #8b5cf6;
-  --purple-gradient: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
-  --purple-card-bg: linear-gradient(135deg, rgba(24, 10, 48, 0.85) 0%, rgba(12, 8, 24, 0.92) 100%);
+  --purple-primary: #ef4444;
+  --purple-gradient: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+  --purple-card-bg: linear-gradient(135deg, rgba(60, 10, 18, 0.85) 0%, rgba(20, 4, 8, 0.94) 100%);
   --cyan-primary: #38bdf8;
   --green-primary: #10b981;
   --red-primary: #ef4444;
@@ -37,8 +37,8 @@
 body {
   background-color: #040406;
   background-image: 
-    radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.09) 0%, transparent 55%),
-    linear-gradient(to bottom, rgba(4, 4, 6, 0.82), rgba(4, 4, 6, 0.94)),
+    radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.12) 0%, transparent 55%),
+    linear-gradient(to bottom, rgba(4, 4, 6, 0.84), rgba(4, 4, 6, 0.95)),
     url('/wallpaper.jpg');
   background-size: cover;
   background-position: center top;
@@ -78,10 +78,10 @@ body {
 
 /* Glassmorphic panels */
 .glass-panel {
-  background: rgba(10, 10, 16, 0.75);
+  background: rgba(10, 10, 16, 0.78);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.18);
 }
 
 /* Animations */
@@ -98,22 +98,22 @@ body {
 
 @keyframes pulseGlow {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(139, 92, 246, 0.25);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.25);
   }
   50% {
-    box-shadow: 0 0 30px rgba(139, 92, 246, 0.55);
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.60);
   }
 }
 
 @keyframes crestShimmer {
   0% {
-    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.45));
   }
   50% {
-    filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.65));
+    filter: drop-shadow(0 0 24px rgba(239, 68, 68, 0.85));
   }
   100% {
-    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.45));
   }
 }
 
@@ -134,9 +134,9 @@ body {
   background: #040406;
 }
 ::-webkit-scrollbar-thumb {
-  background: #181824;
+  background: #280a0e;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #282838;
+  background: #dc2626;
 }
