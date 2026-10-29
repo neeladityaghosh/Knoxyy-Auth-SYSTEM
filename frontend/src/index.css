@@ -1,15 +1,15 @@
-:root {
-  --bg-dark: #0b0c10;
-  --bg-surface: #121319;
-  --bg-surface-elevated: #171822;
-  --bg-surface-hover: #1c1e2b;
+﻿:root {
+  --bg-dark: #050508;
+  --bg-surface: rgba(12, 12, 18, 0.82);
+  --bg-surface-elevated: rgba(18, 18, 28, 0.88);
+  --bg-surface-hover: rgba(28, 28, 42, 0.95);
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-medium: rgba(255, 255, 255, 0.14);
-  --border-glow-purple: rgba(139, 92, 246, 0.4);
+  --border-glow-purple: rgba(139, 92, 246, 0.35);
 
   --purple-primary: #8b5cf6;
   --purple-gradient: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
-  --purple-card-bg: linear-gradient(135deg, #2e1065 0%, #3b0764 45%, #1e1b4b 100%);
+  --purple-card-bg: linear-gradient(135deg, rgba(24, 10, 48, 0.85) 0%, rgba(12, 8, 24, 0.92) 100%);
   --cyan-primary: #38bdf8;
   --green-primary: #10b981;
   --red-primary: #ef4444;
@@ -35,7 +35,15 @@
 }
 
 body {
-  background-color: var(--bg-dark);
+  background-color: #040406;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.09) 0%, transparent 55%),
+    linear-gradient(to bottom, rgba(4, 4, 6, 0.82), rgba(4, 4, 6, 0.94)),
+    url('/wallpaper.jpg');
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
   color: var(--text-main);
   font-family: var(--font-body);
   min-height: 100vh;
@@ -68,6 +76,14 @@ body {
   flex: 1;
 }
 
+/* Glassmorphic panels */
+.glass-panel {
+  background: rgba(10, 10, 16, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 /* Animations */
 @keyframes fadeInScale {
   from {
@@ -85,12 +101,28 @@ body {
     box-shadow: 0 0 15px rgba(139, 92, 246, 0.25);
   }
   50% {
-    box-shadow: 0 0 30px rgba(139, 92, 246, 0.45);
+    box-shadow: 0 0 30px rgba(139, 92, 246, 0.55);
+  }
+}
+
+@keyframes crestShimmer {
+  0% {
+    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 22px rgba(255, 255, 255, 0.65));
+  }
+  100% {
+    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
   }
 }
 
 .animate-fade-in {
   animation: fadeInScale 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.gothic-crest-glow {
+  animation: crestShimmer 3.5s ease-in-out infinite;
 }
 
 /* Scrollbar */
@@ -99,12 +131,12 @@ body {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-dark);
+  background: #040406;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e202c;
+  background: #181824;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2e3244;
+  background: #282838;
 }

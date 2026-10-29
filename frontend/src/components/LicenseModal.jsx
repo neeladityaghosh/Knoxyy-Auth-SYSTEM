@@ -1,3 +1,4 @@
+﻿import { playSound } from '../utils/audio';
 import React, { useState, useEffect } from 'react';
 import { X, Check, Key, Shield, Sparkles, Copy } from 'lucide-react';
 
@@ -78,12 +79,14 @@ export default function LicenseModal({
       });
       const data = await res.json();
       if (data.success) {
+        playSound('activate');
         setCreatedKey(data.key);
         setCreatedProduct(data.product || product);
         navigator.clipboard.writeText(data.key);
         showToast(`Key generated & copied to clipboard: ${data.key}`);
         if (onCreated) onCreated();
       } else {
+        playSound('error');
         showToast(data.error || 'Failed to generate key');
       }
     } catch (err) {
@@ -95,6 +98,7 @@ export default function LicenseModal({
 
   const copyKey = () => {
     if (createdKey) {
+      playSound('click');
       navigator.clipboard.writeText(createdKey);
       showToast('Key copied to clipboard!');
     }
@@ -179,7 +183,7 @@ export default function LicenseModal({
                   transition: 'all 0.15s ease'
                 }}
               >
-                🎮 Emulator
+                ðŸŽ® Emulator
               </button>
               <button
                 type="button"
@@ -196,7 +200,7 @@ export default function LicenseModal({
                   transition: 'all 0.15s ease'
                 }}
               >
-                ⚡ Optimizer
+                âš¡ Optimizer
               </button>
               <button
                 type="button"
@@ -213,7 +217,7 @@ export default function LicenseModal({
                   transition: 'all 0.15s ease'
                 }}
               >
-                🌟 VIP Both
+                ðŸŒŸ VIP Both
               </button>
             </div>
           </div>
@@ -239,18 +243,18 @@ export default function LicenseModal({
             >
               <option value="">-- Standard Suite Key --</option>
               <optgroup label="Emulator Products">
-                <option value="05 Emulator - ₹1,499">05 Emulator - ₹1,499</option>
-                <option value="01 Sensitivity (Sensi) - ₹599">01 Sensitivity (Sensi) - ₹599</option>
+                <option value="05 Emulator - â‚¹1,499">05 Emulator - â‚¹1,499</option>
+                <option value="01 Sensitivity (Sensi) - â‚¹599">01 Sensitivity (Sensi) - â‚¹599</option>
               </optgroup>
               <optgroup label="Optimizer Products">
-                <option value="02 Optimization - ₹1,199">02 Optimization - ₹1,199</option>
-                <option value="03 Bat Files - ₹499">03 Bat Files - ₹499</option>
-                <option value="04 Debloater - ₹299">04 Debloater - ₹299</option>
-                <option value="06 Registry - ₹299">06 Registry - ₹299</option>
-                <option value="07 Tweaks - ₹399">07 Tweaks - ₹399</option>
+                <option value="02 Optimization - â‚¹1,199">02 Optimization - â‚¹1,199</option>
+                <option value="03 Bat Files - â‚¹499">03 Bat Files - â‚¹499</option>
+                <option value="04 Debloater - â‚¹299">04 Debloater - â‚¹299</option>
+                <option value="06 Registry - â‚¹299">06 Registry - â‚¹299</option>
+                <option value="07 Tweaks - â‚¹399">07 Tweaks - â‚¹399</option>
               </optgroup>
               <optgroup label="All-in-One Bundle">
-                <option value="★ Full Bundle - ₹3,799">★ Full Bundle (All 7 Packs + VIP) - ₹3,799</option>
+                <option value="â˜… Full Bundle - â‚¹3,799">â˜… Full Bundle (All 7 Packs + VIP) - â‚¹3,799</option>
               </optgroup>
             </select>
           </div>
@@ -297,7 +301,7 @@ export default function LicenseModal({
                 outline: 'none'
               }}
             >
-              <option value="-1">♾️ Lifetime (Permanent / Never Expire)</option>
+              <option value="-1">â™¾ï¸ Lifetime (Permanent / Never Expire)</option>
               <option value="30">30 Days (Standard Month)</option>
               <option value="7">7 Days (Starter Trial)</option>
               <option value="90">90 Days (Quarterly Season)</option>
@@ -316,7 +320,7 @@ export default function LicenseModal({
               textAlign: 'center'
             }}>
               <div style={{ fontSize: '11.5px', color: '#6ee7b7', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>
-                ✓ License Key Generated &amp; Copied!
+                âœ“ License Key Generated &amp; Copied!
               </div>
               <div
                 onClick={copyKey}
@@ -379,7 +383,7 @@ export default function LicenseModal({
                 boxShadow: '0 4px 14px rgba(255, 255, 255, 0.2)'
               }}
             >
-              {isSubmitting ? 'Generating...' : '⚡ Generate Key'}
+              {isSubmitting ? 'Generating...' : 'âš¡ Generate Key'}
             </button>
           </div>
         </form>

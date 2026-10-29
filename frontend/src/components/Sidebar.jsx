@@ -1,10 +1,11 @@
-import React from 'react';
-import { Compass, Cpu, Zap, CreditCard, RotateCw, Plus, SlidersHorizontal, Layers } from 'lucide-react';
+﻿import React from 'react';
+import { Compass, Cpu, Zap, CreditCard, RotateCw, Plus, SlidersHorizontal } from 'lucide-react';
+import { playSound } from '../utils/audio';
 
 export default function Sidebar({ currentView, setView, onOpenCreate, onRefresh, isRefreshing, accentColor = '#a855f7' }) {
   const navItems = [
     { id: 'landing', label: 'Overview', icon: Compass },
-    { id: 'emulator', label: 'Knoxyy Emulator', icon: Cpu },
+    { id: 'emulator', label: 'Knoxyy Emulator (Black Edition)', icon: Cpu },
     { id: 'optimizer', label: 'Knoxyy Optimizer', icon: Zap },
     { id: 'pricing', label: 'Store & Pricing', icon: CreditCard },
     { id: 'settings', label: 'Settings & Theme', icon: SlidersHorizontal }
@@ -13,7 +14,8 @@ export default function Sidebar({ currentView, setView, onOpenCreate, onRefresh,
   return (
     <aside style={{
       width: '78px',
-      background: '#0d0e14',
+      background: 'rgba(7, 7, 12, 0.92)',
+      backdropFilter: 'blur(16px)',
       borderRight: '1px solid var(--border-subtle)',
       display: 'flex',
       flexDirection: 'column',
@@ -28,7 +30,8 @@ export default function Sidebar({ currentView, setView, onOpenCreate, onRefresh,
     }}>
       {/* Top Logo */}
       <div 
-        onClick={() => setView('landing')}
+        onClick={() => { playSound('click'); setView('landing'); }}
+        onMouseEnter={() => playSound('hover')}
         title="Knoxyy Home"
         style={{
           width: '50px',
@@ -42,17 +45,17 @@ export default function Sidebar({ currentView, setView, onOpenCreate, onRefresh,
           marginBottom: '14px',
           padding: '4px'
         }}
-        onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.08)'}
-        onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.08)'}
+        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
       >
         <img 
           src="/logo.png" 
           alt="Knoxyy Logo" 
+          className="gothic-crest-glow"
           style={{ 
             width: '100%', 
             height: '100%', 
-            objectFit: 'contain',
-            filter: 'drop-shadow(0 2px 8px rgba(124, 58, 237, 0.45))'
+            objectFit: 'contain'
           }} 
         />
       </div>
@@ -73,42 +76,43 @@ export default function Sidebar({ currentView, setView, onOpenCreate, onRefresh,
           return (
             <button
               key={item.id}
-              onClick={() => setView(item.id)}
+              onClick={() => { playSound('click'); setView(item.id); }}
+              onMouseEnter={() => playSound('hover')}
               title={item.label}
               style={{
                 width: '46px',
                 height: '46px',
                 borderRadius: '12px',
-                background: isActive ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
-                border: isActive ? `1px solid ${accentColor}80` : '1px solid transparent',
+                background: isActive ? 'rgba(139, 92, 246, 0.16)' : 'transparent',
+                border: isActive ? '1px solid rgba(139, 92, 246, 0.45)' : '1px solid transparent',
                 color: isActive ? '#ffffff' : '#64748b',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
                 transition: 'all 0.18s ease',
-                boxShadow: isActive ? '0 2px 10px rgba(0, 0, 0, 0.4)' : 'none',
+                boxShadow: isActive ? '0 2px 14px rgba(139, 92, 246, 0.25)' : 'none',
               }}
-              onMouseEnter={(e) => {
+              onMouseOver={(e) => {
                 if (!isActive) {
                   e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)';
                   e.currentTarget.style.color = '#cbd5e1';
                 }
               }}
-              onMouseLeave={(e) => {
+              onMouseOut={(e) => {
                 if (!isActive) {
                   e.currentTarget.style.background = 'transparent';
                   e.currentTarget.style.color = '#64748b';
                 }
               }}
             >
-              <Icon size={20} color={isActive ? accentColor : '#94a3b8'} />
+              <Icon size={20} color={isActive ? '#a78bfa' : '#94a3b8'} />
             </button>
           );
         })}
       </div>
 
-      {/* Bottom Actions: Refresh & Quick Create (Clean, no pills or dots) */}
+      {/* Bottom Actions: Refresh */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
@@ -117,7 +121,8 @@ export default function Sidebar({ currentView, setView, onOpenCreate, onRefresh,
         width: '100%'
       }}>
         <button
-          onClick={onRefresh}
+          onClick={() => { playSound('click'); onRefresh(); }}
+          onMouseEnter={() => playSound('hover')}
           title="Refresh Data & Metrics"
           style={{
             width: '44px',
@@ -130,46 +135,18 @@ export default function Sidebar({ currentView, setView, onOpenCreate, onRefresh,
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            transition: 'all 0.15s ease',
+            transition: 'all 0.15s ease'
           }}
-          onMouseEnter={(e) => {
+          onMouseOver={(e) => {
             e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)';
             e.currentTarget.style.color = '#cbd5e1';
           }}
-          onMouseLeave={(e) => {
+          onMouseOut={(e) => {
             e.currentTarget.style.background = 'transparent';
             e.currentTarget.style.color = '#64748b';
           }}
         >
-          <RotateCw size={17} className={isRefreshing ? 'animate-spin' : ''} />
-        </button>
-
-        <button
-          onClick={() => onOpenCreate()}
-          title="Create License Key"
-          style={{
-            width: '44px',
-            height: '44px',
-            borderRadius: '12px',
-            background: `${accentColor}20`,
-            border: `1px solid ${accentColor}50`,
-            color: '#ffffff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = `${accentColor}35`;
-            e.currentTarget.style.transform = 'translateY(-1px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = `${accentColor}20`;
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
-        >
-          <Plus size={18} strokeWidth={2.5} />
+          <RotateCw size={18} className={isRefreshing ? 'animate-spin' : ''} />
         </button>
       </div>
     </aside>
